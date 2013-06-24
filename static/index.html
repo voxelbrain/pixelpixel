@@ -1,0 +1,22 @@
+<!doctype html>
+<head>
+  <link href="/templates/styles.css" rel="stylesheet" type="text/css" />
+</head>
+<style>
+</style>
+<div id="pixels">
+	<canvas width="256" height="256"></canvas>
+	<canvas width="256" height="256"></canvas>
+	<canvas width="256" height="256"></canvas>
+	<canvas width="256" height="256"></canvas>
+	<canvas width="256" height="256"></canvas>
+</div>
+<script>
+	var ws = new WebSocket('ws://'+window.location.host+'/ws');
+	ws.onclose = function() {
+		console.log('WebSocket closed');
+	};
+	ws.onmessage = function(ev) {
+		var obj = ev.data;
+	};
+</script>
