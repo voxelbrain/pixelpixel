@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/gorilla/mux"
@@ -17,6 +16,7 @@ var (
 		NumPixelsPerRow int           `goptions:"-r, --per-row, description='Number of pixels per row'"`
 		TemplateDir     string        `goptions:"-t, --templates, description='Path to the templates'"`
 		StaticDir       string        `goptions:"--static, description='Path to the static content'"`
+		Lxc             bool          `goptions:"-x, --lxc, description='Use lxc containers for pixels'"`
 		Help            goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	}{
 		Listen:          "localhost:8080",
@@ -35,6 +35,13 @@ func main() {
 		Dir:  options.TemplateDir,
 		Data: TemplateData(),
 	}))
+
+	cm := ContainerManager(NewLocalContainerManager())
+	if options.Lxc {
+		log.Fatalf("LXC support not implemented yet")
+	}
+	r.PathPrefix("/pixels").Handler(http.StripPrefix("/pixels", NewContainerManagerAPI(cm)))
+
 	r.PathPrefix("/").Methods("GET").Handler(http.FileServer(http.Dir(options.StaticDir)))
 
 	log.Printf("Starting webserver on %s...", options.Listen)
