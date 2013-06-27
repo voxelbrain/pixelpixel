@@ -12,9 +12,10 @@ func (c ContainerId) String() string {
 }
 
 type ContainerManager interface {
-	NewContainer(fs *tar.Reader) (ContainerId, error)
+	NewContainer(fs *tar.Reader, envInjection []string) (ContainerId, error)
 	DestroyContainer(id ContainerId) error
 	WaitFor(id ContainerId) chan bool
+	Logs(id ContainerId) ([]byte, error)
 }
 
 type ContainerManagerAPI struct {

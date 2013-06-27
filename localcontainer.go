@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -37,7 +38,7 @@ func NewLocalContainerManager() *LocalContainerManager {
 	return r
 }
 
-func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader) (ContainerId, error) {
+func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []string) (ContainerId, error) {
 	id := ContainerId(gouuid.New().String())
 	dir := filepath.Join(lcm.Root, id.String())
 	err := os.MkdirAll(dir, os.FileMode(0755))
@@ -65,6 +66,7 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader) (ContainerId, err
 	ctr.Cmd.Dir = dir
 	ctr.Cmd.Stdout = ctr.Logs
 	ctr.Cmd.Stderr = ctr.Logs
+	ctr.Cmd.Env = stringList(os.Environ(), envInjections, fmt.Sprintf("PORT=%d", <-portGenerator))
 	err = ctr.Cmd.Start()
 	if err != nil {
 		return id, err
@@ -114,6 +116,14 @@ func (lcm *LocalContainerManager) WaitFor(id ContainerId) chan bool {
 		return nil
 	}
 	return ctr.Done
+}
+
+func (lcm *LocalContainerManager) Logs(id ContainerId) ([]byte, error) {
+	ctr, ok := lcm.containers[id]
+	if !ok {
+		return nil, os.ErrNotExist
+	}
+	return ctr.Logs.Bytes(), nil
 }
 
 func (lc *localContainer) extractFileSystem(fs *tar.Reader) error {
@@ -167,4 +177,18 @@ func stringList(args ...interface{}) []string {
 		}
 	}
 	return x
+}
+
+var (
+	portGenerator <-chan int
+)
+
+func init() {
+	go func() {
+		c := make(chan int)
+		portGenerator = c
+		for i := 49000; i < 65535; i++ {
+			c <- i
+		}
+	}()
 }
