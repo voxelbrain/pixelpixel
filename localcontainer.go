@@ -27,6 +27,7 @@ type localContainer struct {
 	Cmd  *exec.Cmd
 	Done chan bool
 	Logs *bytes.Buffer
+	Port int
 }
 
 func NewLocalContainerManager() *LocalContainerManager {
@@ -66,7 +67,8 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	ctr.Cmd.Dir = dir
 	ctr.Cmd.Stdout = ctr.Logs
 	ctr.Cmd.Stderr = ctr.Logs
-	ctr.Cmd.Env = stringList(os.Environ(), envInjections, fmt.Sprintf("PORT=%d", <-portGenerator))
+	ctr.Port = <-portGenerator
+	ctr.Cmd.Env = stringList(os.Environ(), envInjections, fmt.Sprintf("PORT=%d", ctr.Port))
 	err = ctr.Cmd.Start()
 	if err != nil {
 		return id, err
@@ -124,6 +126,14 @@ func (lcm *LocalContainerManager) Logs(id ContainerId) ([]byte, error) {
 		return nil, os.ErrNotExist
 	}
 	return ctr.Logs.Bytes(), nil
+}
+
+func (lcm *LocalContainerManager) Port(id ContainerId) (int, error) {
+	ctr, ok := lcm.containers[id]
+	if !ok {
+		return 0, os.ErrNotExist
+	}
+	return ctr.Port, nil
 }
 
 func (lc *localContainer) extractFileSystem(fs *tar.Reader) error {
@@ -187,8 +197,10 @@ func init() {
 	go func() {
 		c := make(chan int)
 		portGenerator = c
-		for i := 49000; i < 65535; i++ {
-			c <- i
+		for {
+			for i := 49000; i < 65535; i++ {
+				c <- i
+			}
 		}
 	}()
 }

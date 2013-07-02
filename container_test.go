@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"fmt"
 	"io"
 	"path/filepath"
 	"reflect"
@@ -132,6 +133,7 @@ func TestPortAssignment(t *testing.T) {
 		t.Fatalf("Timeout occured")
 	}
 
+	fs = tar.NewReader(bytes.NewReader(buf))
 	id2, err := lcm.NewContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
@@ -149,9 +151,24 @@ func TestPortAssignment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not get logs: %s", err)
 	}
+	port1, err := lcm.Port(id1)
+	if err != nil {
+		t.Fatalf("Could not get port: %s", err)
+	}
+	if string(logs1) != fmt.Sprintf("%d", port1) {
+		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port1, logs1)
+	}
+
 	logs2, err := lcm.Logs(id2)
 	if err != nil {
 		t.Fatalf("Could not get logs: %s", err)
+	}
+	port2, err := lcm.Port(id2)
+	if err != nil {
+		t.Fatalf("Could not get port: %s", err)
+	}
+	if string(logs2) != fmt.Sprintf("%d", port2) {
+		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port2, logs2)
 	}
 
 	if reflect.DeepEqual(logs1, logs2) {
