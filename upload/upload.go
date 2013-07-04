@@ -4,9 +4,11 @@ import (
 	"archive/tar"
 	"bytes"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/voxelbrain/goptions"
@@ -21,26 +23,49 @@ var (
 	}
 )
 
+const (
+	keyFile = ".key"
+)
+
 func main() {
 	goptions.ParseAndFail(&options)
+
+	key := loadKey()
 
 	fs, err := createFs(".")
 	if err != nil {
 		log.Fatalf("Could not create filesystem: %s", err)
 	}
 
-	resp, err := http.Post("http://"+options.Server+"/pixels/", "application/tar", bytes.NewReader(fs))
+	var req *http.Request
+	if key == "" {
+		url := "http://" + path.Join(options.Server, "pixels") + "/"
+		req, _ = http.NewRequest("POST", url, bytes.NewReader(fs))
+	} else {
+		url := "http://" + path.Join(options.Server, "pixels", key)
+		req, _ = http.NewRequest("PUT", url, bytes.NewReader(fs))
+	}
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Fatalf("Could not upload filesystem: %s", err)
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		log.Fatalf("An error occured! Status code: %d", resp.StatusCode)
+	}
+
 	buf := &bytes.Buffer{}
 	io.Copy(buf, resp.Body)
-
-	if resp.StatusCode != 200 {
-		log.Fatalf("Server did not accept filesystem: %s", buf.String())
+	if key == "" {
+		f, err := os.Create(keyFile)
+		if err != nil {
+			log.Fatalf("Could not save key file (key=%s): %s", buf.String(), err)
+		}
+		defer f.Close()
+		f.Write(buf.Bytes())
 	}
-	log.Printf("Your ID: %s", buf.String())
 }
 
 func createFs(path string) ([]byte, error) {
@@ -81,4 +106,17 @@ func createFs(path string) ([]byte, error) {
 	fs.Flush()
 	fs.Close()
 	return buf.Bytes(), err
+}
+
+func loadKey() string {
+	f, err := os.Open(keyFile)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	key, err := ioutil.ReadAll(f)
+	if err != nil {
+		return ""
+	}
+	return string(key)
 }

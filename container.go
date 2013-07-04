@@ -46,6 +46,7 @@ func NewContainerManagerAPI(cm ContainerManager) *ContainerManagerAPI {
 	}
 
 	handler.Path("/").Methods("POST").HandlerFunc(cma.CreatePixelHandler)
+	handler.Path("/{key}").Methods("PUT").HandlerFunc(cma.UpdatePixelHandler)
 	handler.Path("/{key}").Methods("DELETE").HandlerFunc(cma.DeletePixelHandler)
 	handler.Path("/{key}").Methods("GET").HandlerFunc(cma.GetPixelLogHandler)
 
@@ -53,8 +54,8 @@ func NewContainerManagerAPI(cm ContainerManager) *ContainerManagerAPI {
 }
 
 func (cma *ContainerManagerAPI) CreatePixelHandler(w http.ResponseWriter, r *http.Request) {
-	fs := tar.NewReader(r.Body)
 	defer r.Body.Close()
+	fs := tar.NewReader(r.Body)
 
 	id, err := cma.ContainerManager.NewContainer(fs, nil)
 	if err != nil {
@@ -68,6 +69,42 @@ func (cma *ContainerManagerAPI) CreatePixelHandler(w http.ResponseWriter, r *htt
 	cma.idMap[key] = id
 
 	fmt.Fprintf(w, "%s", key)
+}
+
+func (cma *ContainerManagerAPI) UpdatePixelHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	vars := mux.Vars(r)
+	key, ok := vars["key"]
+	if !ok {
+		http.Error(w, "Key missing", http.StatusBadRequest)
+		return
+	}
+
+	id, ok := cma.idMap[key]
+	if !ok {
+		http.Error(w, "Unknown key", http.StatusBadRequest)
+		return
+	}
+
+	err := cma.DestroyContainer(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fs := tar.NewReader(r.Body)
+	id, err = cma.ContainerManager.NewContainer(fs, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	cma.Lock()
+	defer cma.Unlock()
+	cma.idMap[key] = id
+
+	http.Error(w, "", http.StatusNoContent)
 }
 
 const (
