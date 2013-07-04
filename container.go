@@ -38,6 +38,7 @@ func NewContainerManagerAPI(cm ContainerManager) *ContainerManagerAPI {
 
 	handler.Path("/").Methods("POST").HandlerFunc(cma.CreatePixelHandler)
 	handler.Path("/{id}").Methods("DELETE").HandlerFunc(cma.DeletePixelHandler)
+	handler.Path("/{id}").Methods("GET").HandlerFunc(cma.GetPixelLogHandler)
 	handler.Path("/{id}/").HandlerFunc(cma.ReverseProxy)
 
 	return cma
@@ -49,18 +50,32 @@ func (cma *ContainerManagerAPI) CreatePixelHandler(w http.ResponseWriter, r *htt
 
 	id, err := cma.ContainerManager.NewContainer(fs, nil)
 	if err != nil {
-		http.Error(w, "", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	fmt.Fprintf(w, "%s", id)
 }
 
+func (cma *ContainerManagerAPI) GetPixelLogHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := gouuid.ParseString(vars["id"])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	logs, err := cma.Logs(ContainerId(id.String()))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	w.Write(logs)
+}
+
 func (cma *ContainerManagerAPI) DeletePixelHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := gouuid.ParseString(vars["id"])
 	if err != nil {
-		http.Error(w, "", http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
 	cma.ContainerManager.DestroyContainer(ContainerId(id.String()))
