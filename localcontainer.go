@@ -138,7 +138,10 @@ func (lcm *LocalContainerManager) Port(id ContainerId) (int, error) {
 
 func (lc *localContainer) extractFileSystem(fs *tar.Reader) error {
 	hdr, err := fs.Next()
-	for err == nil {
+	for err != io.EOF {
+		if err != nil {
+			return err
+		}
 		file := filepath.Join(lc.Root, hdr.Name)
 		switch hdr.Typeflag {
 		case tar.TypeDir:

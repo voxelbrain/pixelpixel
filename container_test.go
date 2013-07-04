@@ -104,6 +104,17 @@ func TestWaitFor(t *testing.T) {
 	}
 }
 
+func TestInvalidTar(t *testing.T) {
+	data := bytes.NewReader([]byte(`This is obivously not a valid tar`))
+	fs := tar.NewReader(data)
+
+	lcm := NewLocalContainerManager()
+	_, err := lcm.NewContainer(fs, nil)
+	if err == nil {
+		t.Fatalf("Corrupted tar file was accepted")
+	}
+}
+
 func TestPortAssignment(t *testing.T) {
 	buf := makeFs(map[string]interface{}{
 		"main.go": `package main
