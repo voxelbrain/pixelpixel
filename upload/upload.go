@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/voxelbrain/goptions"
 )
@@ -72,7 +73,7 @@ func createFs(path string) ([]byte, error) {
 	buf := &bytes.Buffer{}
 	fs := tar.NewWriter(buf)
 	err := filepath.Walk(path, func(path string, info os.FileInfo, _ error) error {
-		if path == "." {
+		if strings.HasPrefix(path, ".") {
 			return nil
 		}
 		log.Printf("Adding %s", path)
