@@ -3,7 +3,6 @@ package main
 import (
 	"archive/tar"
 	"bytes"
-	"fmt"
 	"io"
 	"path/filepath"
 	"reflect"
@@ -125,7 +124,7 @@ func TestPortAssignment(t *testing.T) {
 		)
 
 		func main() {
-			fmt.Printf("%s", os.Getenv("PORT"))
+			fmt.Printf("localhost:%s", os.Getenv("PORT"))
 		}`,
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
@@ -162,11 +161,11 @@ func TestPortAssignment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not get logs: %s", err)
 	}
-	port1, err := lcm.Port(id1)
+	port1, err := lcm.SocketAddress(id1)
 	if err != nil {
 		t.Fatalf("Could not get port: %s", err)
 	}
-	if string(logs1) != fmt.Sprintf("%d", port1) {
+	if string(logs1) != port1 {
 		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port1, logs1)
 	}
 
@@ -174,11 +173,11 @@ func TestPortAssignment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not get logs: %s", err)
 	}
-	port2, err := lcm.Port(id2)
+	port2, err := lcm.SocketAddress(id2)
 	if err != nil {
 		t.Fatalf("Could not get port: %s", err)
 	}
-	if string(logs2) != fmt.Sprintf("%d", port2) {
+	if string(logs2) != port2 {
 		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port2, logs2)
 	}
 

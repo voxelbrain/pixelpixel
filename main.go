@@ -52,4 +52,5 @@ func main() {
 }
 
 func streamingHandler(c *websocket.Conn) {
+
 }

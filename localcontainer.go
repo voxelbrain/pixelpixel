@@ -128,12 +128,12 @@ func (lcm *LocalContainerManager) Logs(id ContainerId) ([]byte, error) {
 	return ctr.Logs.Bytes(), nil
 }
 
-func (lcm *LocalContainerManager) Port(id ContainerId) (int, error) {
+func (lcm *LocalContainerManager) SocketAddress(id ContainerId) (string, error) {
 	ctr, ok := lcm.containers[id]
 	if !ok {
-		return 0, os.ErrNotExist
+		return "", os.ErrNotExist
 	}
-	return ctr.Port, nil
+	return fmt.Sprintf("localhost:%d", ctr.Port), nil
 }
 
 func (lc *localContainer) extractFileSystem(fs *tar.Reader) error {
