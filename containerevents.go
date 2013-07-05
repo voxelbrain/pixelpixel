@@ -10,8 +10,8 @@ type ContainerEvents struct {
 }
 
 type Event struct {
-	Type EventType
-	Id   ContainerId
+	Type EventType   `json:"type"`
+	Id   ContainerId `json:"id"`
 }
 
 type EventType int

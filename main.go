@@ -53,7 +53,32 @@ func main() {
 }
 
 func NewStreamingHandler(cm ContainerManager, c <-chan *Event) websocket.Handler {
+	f := NewFanout(c)
 	return websocket.Handler(func(c *websocket.Conn) {
+		events := f.Output()
+		defer f.Close(events)
 
+		go func() {
+			buf := make([]byte, 16)
+			for {
+				_, err := c.Read(buf)
+				if err != nil {
+					f.Close(events)
+					return
+				}
+			}
+		}()
+
+		func() {
+			for {
+				select {
+				case event, ok := <-events:
+					if !ok {
+						return
+					}
+					websocket.JSON.Send(c, event)
+				}
+			}
+		}()
 	})
 }

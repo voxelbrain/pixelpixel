@@ -5,14 +5,36 @@
 <style>
 </style>
 <div id="pixels">
-	<canvas width="256" height="256" id="c1"></canvas>
 </div>
 <script>
 	var ws = new WebSocket('ws://'+window.location.host+'/ws');
+	var pixels = document.querySelector('#pixels');
+
+	var i = 0;
+	var EventContainerCreated = i++;
+	var EventContainerDestroyed = i++;
+
 	ws.onclose = function() {
 		console.log('WebSocket closed');
 	};
 	ws.onmessage = function(ev) {
-		var obj = ev.data;
+		console.log('Received event: '+ ev.data);
+		event = JSON.parse(ev.data);
+
+		switch(event.type) {
+			case EventContainerCreated:
+				console.log('Creating pixel');
+				var pixel = document.createElement('canvas');
+				pixel.id = event.id;
+				pixels.appendChild(pixel);
+			break;
+			case EventContainerDestroyed:
+				console.log('Destroying pixel');
+				var pixel = document.getElementById(event.id);
+				if(pixel) {
+					pixel.remove();
+				}
+			break;
+		}
 	};
 </script>

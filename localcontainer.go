@@ -74,10 +74,10 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 		return id, err
 	}
 
-	go func(c chan bool) {
+	go func() {
 		ctr.Cmd.Wait()
-		close(c)
-	}(ctr.Done)
+		close(ctr.Done)
+	}()
 
 	lcm.m.Lock()
 	lcm.containers[id] = ctr
