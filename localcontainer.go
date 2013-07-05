@@ -74,10 +74,10 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 		return id, err
 	}
 
-	go func() {
+	go func(ctr *localContainer) {
 		ctr.Cmd.Wait()
 		close(ctr.Done)
-	}()
+	}(ctr)
 
 	lcm.m.Lock()
 	lcm.containers[id] = ctr
@@ -101,12 +101,8 @@ func (lcm *LocalContainerManager) DestroyContainer(id ContainerId) error {
 	}
 
 	ctr.Cmd.Process.Signal(os.Interrupt)
-	c := make(chan error)
-	go func() {
-		c <- ctr.Cmd.Wait()
-	}()
 	select {
-	case <-c:
+	case <-ctr.Done:
 		// Nop
 	case <-time.After(5 * time.Second):
 		ctr.Cmd.Process.Signal(os.Kill)
