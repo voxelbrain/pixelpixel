@@ -12,6 +12,7 @@ import (
 type Fanout struct {
 	*sync.RWMutex
 	consumers map[chan interface{}]struct{}
+	closing   map[chan interface{}]bool
 }
 
 // Create a new fanout from a channel. c has to be a channel type
@@ -20,6 +21,7 @@ func NewFanout(c interface{}) *Fanout {
 	f := &Fanout{
 		RWMutex:   &sync.RWMutex{},
 		consumers: map[chan interface{}]struct{}{},
+		closing:   map[chan interface{}]bool{},
 	}
 	go f.loop(c)
 	return f
@@ -37,6 +39,9 @@ func (f *Fanout) Output() <-chan interface{} {
 // Close a consumer channel, stopping propagation for this particular
 // consumer.
 func (f *Fanout) Close(rc <-chan interface{}) {
+	f.RLock()
+	defer f.RUnlock()
+
 	// Lookup original channel because we can't call close()
 	// on a receive-only channel
 	var c chan interface{}
@@ -46,20 +51,30 @@ func (f *Fanout) Close(rc <-chan interface{}) {
 		}
 	}
 
+	// If channel is not in consumers map are is already about to close
+	// don't try to do it again.
+	if _, ok := f.closing[c]; c == nil || ok {
+		return
+	}
+	f.closing[c] = true
+
 	// Wait for the current broadcast to finish (effectively unlocking
 	// the mutex) and delete the consumer from the map.
 	go func() {
 		f.Lock()
 		defer f.Unlock()
 		delete(f.consumers, c)
+		delete(f.closing, c)
 		close(c)
 	}()
 
 	// Eat the values possibly left in channel in case the consumer
-	// didn't.
+	// doesn't.
 	go func() {
 		for {
 			_, ok := <-c
+			// If the channel is closed it has been removed from
+			// the consumers map by the previous goroutine. Stop eating.
 			if !ok {
 				return
 			}
@@ -86,8 +101,8 @@ func (f *Fanout) loop(c interface{}) {
 }
 
 func (f *Fanout) closeConsumers() {
-	f.Lock()
-	defer f.Unlock()
+	f.RLock()
+	defer f.RUnlock()
 	for c := range f.consumers {
 		f.Close(c)
 	}
