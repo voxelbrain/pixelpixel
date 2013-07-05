@@ -29,17 +29,18 @@ var (
 func main() {
 	goptions.ParseAndFail(&options)
 
+	cm, events := NewContainerEvents(NewLocalContainerManager())
+	if options.Lxc {
+		log.Fatalf("LXC support not implemented yet")
+	}
+
 	r := mux.NewRouter()
-	r.PathPrefix("/ws").Handler(websocket.Handler(streamingHandler))
+	r.PathPrefix("/ws").Handler(NewStreamingHandler(cm, events))
 	r.PathPrefix("/templates").Methods("GET").Handler(http.StripPrefix("/templates", templateRenderer{
 		Dir:  options.TemplateDir,
 		Data: TemplateData(),
 	}))
 
-	cm := ContainerManager(NewLocalContainerManager())
-	if options.Lxc {
-		log.Fatalf("LXC support not implemented yet")
-	}
 	r.PathPrefix("/pixels").Handler(http.StripPrefix("/pixels", NewContainerManagerAPI(cm)))
 
 	r.PathPrefix("/").Methods("GET").Handler(http.FileServer(http.Dir(options.StaticDir)))
@@ -51,6 +52,8 @@ func main() {
 	}
 }
 
-func streamingHandler(c *websocket.Conn) {
+func NewStreamingHandler(cm ContainerManager, c <-chan *Event) websocket.Handler {
+	return websocket.Handler(func(c *websocket.Conn) {
 
+	})
 }

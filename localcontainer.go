@@ -86,6 +86,14 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	return id, nil
 }
 
+func (lcm *LocalContainerManager) AllContainers() []ContainerId {
+	r := make([]ContainerId, 0, len(lcm.containers))
+	for cid := range lcm.containers {
+		r = append(r, cid)
+	}
+	return r
+}
+
 func (lcm *LocalContainerManager) DestroyContainer(id ContainerId) error {
 	ctr, ok := lcm.containers[id]
 	if !ok {
@@ -197,9 +205,9 @@ var (
 )
 
 func init() {
+	c := make(chan int)
+	portGenerator = c
 	go func() {
-		c := make(chan int)
-		portGenerator = c
 		for {
 			for i := 49000; i < 65535; i++ {
 				c <- i

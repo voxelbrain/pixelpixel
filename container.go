@@ -23,6 +23,7 @@ func (c ContainerId) String() string {
 
 type ContainerManager interface {
 	NewContainer(fs *tar.Reader, envInjection []string) (ContainerId, error)
+	AllContainers() []ContainerId
 	DestroyContainer(id ContainerId) error
 	WaitFor(id ContainerId) chan bool
 	Logs(id ContainerId) ([]byte, error)
