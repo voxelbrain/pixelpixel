@@ -47,7 +47,7 @@ func main() {
 
 	code, body, err := makeApiCall("POST", "/", bytes.NewReader(fs))
 
-	if code >= 300 {
+	if code >= 300 || err != nil {
 		log.Fatalf("Could not upload new pixel. Status code: %d, Error: %s", code, err)
 	}
 
@@ -65,14 +65,20 @@ func makeApiCall(method, subpath string, body io.Reader) (int, string, error) {
 	log.Printf("URL: %s", url)
 	req, _ := http.NewRequest(method, url, body)
 	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Fatalf("Could not delete old pixel: %s", err)
-	}
-	defer resp.Body.Close()
-
 	buf := &bytes.Buffer{}
-	io.Copy(buf, resp.Body)
-	return resp.StatusCode, buf.String(), err
+
+	code := -1
+	if resp != nil {
+		defer resp.Body.Close()
+		code = resp.StatusCode
+		io.Copy(buf, resp.Body)
+	}
+
+	// TODO: Sadly, this seems to be necassary. Can't seem to get it
+	// working without it. I always get `malformed HTTP response ""`
+	http.DefaultTransport.(*http.Transport).CloseIdleConnections()
+
+	return code, buf.String(), err
 }
 
 func createFs(path string) ([]byte, error) {
