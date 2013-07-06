@@ -103,6 +103,46 @@ func TestWaitFor(t *testing.T) {
 	}
 }
 
+func TestTwoSequentialContainers(t *testing.T) {
+	buf := makeFs(map[string]interface{}{
+		"main.go": `package main
+
+		func main() {
+		}`,
+	})
+
+	fs1 := tar.NewReader(bytes.NewReader(buf))
+	fs2 := tar.NewReader(bytes.NewReader(buf))
+	lcm := NewLocalContainerManager()
+
+	id1, err := lcm.NewContainer(fs1, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	lcm.DestroyContainer(id1)
+
+	id2, err := lcm.NewContainer(fs2, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	lcm.DestroyContainer(id2)
+
+	count := 0
+	for {
+		select {
+		case <-lcm.WaitFor(id1):
+			count++
+		case <-lcm.WaitFor(id2):
+			count++
+		case <-time.After(1 * time.Second):
+			t.Fatalf("Timeout occured")
+		}
+		if count == 2 {
+			return
+		}
+	}
+}
+
 func TestInvalidTar(t *testing.T) {
 	data := bytes.NewReader([]byte(`This is obivously not a valid tar`))
 	fs := tar.NewReader(data)

@@ -119,7 +119,12 @@ func (lcm *LocalContainerManager) DestroyContainer(id ContainerId) error {
 func (lcm *LocalContainerManager) WaitFor(id ContainerId) chan bool {
 	ctr, ok := lcm.containers[id]
 	if !ok {
-		return nil
+		// Since the original channel is gone, return a new one
+		// that is closed to achieve the same effect.
+		// FIXME: This is kind of stupid, isn't it?
+		c := make(chan bool)
+		close(c)
+		return c
 	}
 	return ctr.Done
 }
