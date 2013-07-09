@@ -9,13 +9,13 @@ type MessageType int
 
 const (
 	TypeCreated MessageType = iota
-	TypeChange  MessageType = iota
-	TypeFailure MessageType = iota
+	TypeChange
+	TypeFailure
 )
 
 type Message struct {
 	Pixel   string      `json:"pixel"`
-	Type    MessageType `json:"message_type"`
+	Type    MessageType `json:"type"`
 	Payload string      `json:"payload"`
 }
 

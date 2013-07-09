@@ -10,10 +10,36 @@
 	var ws = new WebSocket('ws://'+window.location.host+'/ws');
 	var pixels = document.querySelector('#pixels');
 
+	var i = 0;
+	var type_created = i++;
+	var type_change  = i++;
+	var type_failure = i++;
+
+	var create_pixel = function(id) {
+		var pixel = document.createElement('img');
+		pixel.src='http://'+window.location.host+'/pixels/'+id+'/content/';
+		pixel.id = id;
+		pixel.className = 'pixel';
+		return pixel;
+	}
+
 	ws.onclose = function() {
 		console.log('WebSocket closed');
 	};
 	ws.onmessage = function(ev) {
-		console.log('Received event: '+ ev.data);
+		event = JSON.parse(ev.data);
+		console.log(event);
+		switch(event.type) {
+			case type_created:
+				pixels.appendChild(create_pixel(event.pixel));
+			break;
+			case type_change:
+				var old_pixel = document.getElementById(event.pixel);
+				pixels.replaceChild(create_pixel(event.pixel), old_pixel);
+			break
+			case type_failure:
+				document.getElementById(event.pixel).className += ' error';
+			break
+		}
 	};
 </script>

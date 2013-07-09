@@ -2,18 +2,22 @@ package main
 
 import (
 	"archive/tar"
+	"bytes"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
+	"io"
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 var (
-	red = color.NRGBA{255, 255, 255, 0}
+	red  = color.NRGBA{255, 0, 0, 255}
+	blue = color.NRGBA{0, 0, 255, 255}
 )
 
 func main() {
@@ -31,11 +35,25 @@ func main() {
 	defer c.Close()
 
 	img := image.NewRGBA(image.Rect(0, 0, 256, 256))
-	draw.Draw(img, image.Rect(0, 0, 256, 256), &image.Uniform{red}, image.Point{0, 0}, draw.Over)
+	fillColor := blue
+	buf := &bytes.Buffer{}
 	tw := tar.NewWriter(c)
-	tw.WriteHeader(&tar.Header{})
-	png.Encode(tw, img)
-	tw.Flush()
-	tw.WriteHeader(&tar.Header{})
-	select {}
+	for {
+		buf.Reset()
+		if fillColor == blue {
+			fillColor = red
+		} else {
+			fillColor = blue
+		}
+		draw.Draw(img, image.Rect(0, 0, 256, 256), &image.Uniform{fillColor}, image.Point{0, 0}, draw.Over)
+		png.Encode(buf, img)
+
+		tw.WriteHeader(&tar.Header{
+			Size: int64(buf.Len()),
+		})
+		io.Copy(tw, buf)
+		tw.Flush()
+		time.Sleep(2 * time.Second)
+	}
+
 }

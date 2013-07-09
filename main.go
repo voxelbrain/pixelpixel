@@ -43,7 +43,7 @@ func main() {
 	pa := NewPixelApi(NewLocalContainerManager())
 
 	r := mux.NewRouter()
-	r.PathPrefix("/ws").Handler(NewStreamingHandler(pa.Messages))
+	r.PathPrefix("/ws").Handler(NewStreamingHandler(pa))
 	r.PathPrefix("/templates").Methods("GET").Handler(http.StripPrefix("/templates", templateRenderer{
 		Dir:  options.TemplateDir,
 		Data: TemplateData(),
@@ -60,31 +60,37 @@ func main() {
 	}
 }
 
-func NewStreamingHandler(c <-chan *protocol.Message) websocket.Handler {
-	f := NewFanout(c)
+func NewStreamingHandler(pa *PixelApi) websocket.Handler {
+	f := NewFanout(pa.Messages)
 	return websocket.Handler(func(c *websocket.Conn) {
-		events := f.Output()
-		defer f.Close(events)
+		messages := f.Output()
+		defer f.Close(messages)
 
 		go func() {
 			buf := make([]byte, 16)
 			for {
 				_, err := c.Read(buf)
 				if err != nil {
-					f.Close(events)
+					f.Close(messages)
 					return
 				}
 			}
 		}()
 
 		func() {
+			for pixel := range pa.pixels {
+				websocket.JSON.Send(c, &protocol.Message{
+					Pixel: pixel,
+					Type:  protocol.TypeCreated,
+				})
+			}
 			for {
 				select {
-				case event, ok := <-events:
+				case message, ok := <-messages:
 					if !ok {
 						return
 					}
-					websocket.JSON.Send(c, event)
+					websocket.JSON.Send(c, message)
 				}
 			}
 		}()
