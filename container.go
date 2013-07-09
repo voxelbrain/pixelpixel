@@ -24,7 +24,7 @@ func (c ContainerId) String() string {
 type ContainerManager interface {
 	NewContainer(fs *tar.Reader, envInjection []string) (ContainerId, error)
 	AllContainers() []ContainerId
-	DestroyContainer(id ContainerId) error
+	DestroyContainer(id ContainerId, purge bool) error
 	WaitFor(id ContainerId) chan bool
 	Logs(id ContainerId) ([]byte, error)
 	SocketAddress(id ContainerId) (string, error)
@@ -85,7 +85,7 @@ func (cma *ContainerManagerAPI) DeletePixelHandler(w http.ResponseWriter, r *htt
 		http.Error(w, "id missing", http.StatusBadRequest)
 	}
 
-	err := cma.DestroyContainer(ContainerId(id))
+	err := cma.DestroyContainer(ContainerId(id), true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

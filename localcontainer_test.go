@@ -4,6 +4,7 @@ import (
 	"archive/tar"
 	"bytes"
 	"io"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -31,7 +32,7 @@ func TestContainerLogs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id)
+	defer lcm.DestroyContainer(id, true)
 
 	<-lcm.WaitFor(id)
 	output := lcm.containers[id].Logs.String()
@@ -67,7 +68,7 @@ func TestSubfolderHandling(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id)
+	defer lcm.DestroyContainer(id, true)
 
 	<-lcm.WaitFor(id)
 	output, err := lcm.Logs(id)
@@ -93,7 +94,7 @@ func TestWaitFor(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id)
+	defer lcm.DestroyContainer(id, true)
 
 	select {
 	case <-lcm.WaitFor(id):
@@ -101,6 +102,58 @@ func TestWaitFor(t *testing.T) {
 	case <-time.After(1 * time.Second):
 		t.Fatalf("Timeout occured")
 	}
+}
+
+func TestPurge(t *testing.T) {
+	buf := makeFs(map[string]interface{}{
+		"main.go": `package main
+
+		func main() {
+		}`,
+	})
+	fs := tar.NewReader(bytes.NewReader(buf))
+
+	lcm := NewLocalContainerManager()
+	id, err := lcm.NewContainer(fs, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	path := lcm.containers[id].Root
+	destroyed := lcm.containers[id].destroyed
+	lcm.DestroyContainer(id, true)
+
+	select {
+	case <-destroyed:
+		// Nop
+	case <-time.After(1 * time.Second):
+		t.Fatalf("Timeout occured")
+	}
+
+	if info, err := os.Stat(path); err == nil && info.IsDir() {
+		t.Fatalf("Folder %s was not purged", path)
+	}
+
+	fs = tar.NewReader(bytes.NewReader(buf))
+	id, err = lcm.NewContainer(fs, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	path = lcm.containers[id].Root
+	destroyed = lcm.containers[id].destroyed
+	lcm.DestroyContainer(id, false)
+
+	select {
+	case <-destroyed:
+		// Nop
+	case <-time.After(1 * time.Second):
+		t.Fatalf("Timeout occured")
+	}
+
+	if info, err := os.Stat(path); err != nil || !info.IsDir() {
+		t.Fatalf("Folder %s was purged", path)
+	}
+
+	os.RemoveAll(path)
 }
 
 func TestTwoSequentialContainers(t *testing.T) {
@@ -119,13 +172,13 @@ func TestTwoSequentialContainers(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	lcm.DestroyContainer(id1)
+	lcm.DestroyContainer(id1, true)
 
 	id2, err := lcm.NewContainer(fs2, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	lcm.DestroyContainer(id2)
+	lcm.DestroyContainer(id2, true)
 
 	count := 0
 	for {
@@ -174,7 +227,7 @@ func TestPortAssignment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id1)
+	defer lcm.DestroyContainer(id1, true)
 
 	select {
 	case <-lcm.WaitFor(id1):
@@ -188,7 +241,7 @@ func TestPortAssignment(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id2)
+	defer lcm.DestroyContainer(id2, true)
 
 	select {
 	case <-lcm.WaitFor(id2):

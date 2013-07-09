@@ -40,8 +40,8 @@ func (ce *ContainerEvents) NewContainer(fs *tar.Reader, envInjection []string) (
 	return id, err
 }
 
-func (ce *ContainerEvents) DestroyContainer(id ContainerId) error {
-	err := ce.ContainerManager.DestroyContainer(id)
+func (ce *ContainerEvents) DestroyContainer(id ContainerId, purge bool) error {
+	err := ce.ContainerManager.DestroyContainer(id, purge)
 	if err == nil {
 		ce.c <- &Event{
 			Type: EventContainerDestroyed,

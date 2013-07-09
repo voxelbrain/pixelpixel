@@ -22,12 +22,13 @@ type LocalContainerManager struct {
 }
 
 type localContainer struct {
-	Id   ContainerId
-	Root string
-	Cmd  *exec.Cmd
-	Done chan bool
-	Logs *bytes.Buffer
-	Port int
+	Id        ContainerId
+	Root      string
+	Cmd       *exec.Cmd
+	Done      chan bool
+	destroyed chan bool
+	Logs      *bytes.Buffer
+	Port      int
 }
 
 func NewLocalContainerManager() *LocalContainerManager {
@@ -46,12 +47,19 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	if err != nil {
 		return id, err
 	}
+	purge := true
+	defer func() {
+		if purge {
+			os.RemoveAll(dir)
+		}
+	}()
 
 	ctr := &localContainer{
-		Id:   id,
-		Root: dir,
-		Logs: &bytes.Buffer{},
-		Done: make(chan bool),
+		Id:        id,
+		Root:      dir,
+		Logs:      &bytes.Buffer{},
+		Done:      make(chan bool),
+		destroyed: make(chan bool),
 	}
 
 	err = ctr.extractFileSystem(fs)
@@ -83,6 +91,7 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	lcm.containers[id] = ctr
 	lcm.m.Unlock()
 
+	purge = false
 	return id, nil
 }
 
@@ -94,7 +103,7 @@ func (lcm *LocalContainerManager) AllContainers() []ContainerId {
 	return r
 }
 
-func (lcm *LocalContainerManager) DestroyContainer(id ContainerId) error {
+func (lcm *LocalContainerManager) DestroyContainer(id ContainerId, purge bool) error {
 	ctr, ok := lcm.containers[id]
 	if !ok {
 		return os.ErrNotExist
@@ -112,7 +121,10 @@ func (lcm *LocalContainerManager) DestroyContainer(id ContainerId) error {
 	delete(lcm.containers, id)
 	lcm.m.Unlock()
 
-	os.RemoveAll(filepath.Join(lcm.Root, ctr.Id.String()))
+	if purge {
+		os.RemoveAll(ctr.Root)
+	}
+	close(ctr.destroyed)
 	return nil
 }
 
