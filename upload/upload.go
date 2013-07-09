@@ -38,16 +38,18 @@ func main() {
 		log.Fatalf("Could not create filesystem: %s", err)
 	}
 
+	var code int
+	var body string
 	if key != "" {
-		code, _, err := makeApiCall("DELETE", "/"+key, nil)
-		if code >= 300 || err != nil {
-			log.Fatalf("Could not delete old pixel. Status code: %d, Error: %s ", code, err)
-		}
+		log.Printf("Found Pixel ID %s", key)
+		code, body, err = makeApiCall("PUT", "/"+key, bytes.NewReader(fs))
+	} else {
+		log.Printf("Creating a new pixel")
+		code, body, err = makeApiCall("POST", "/", bytes.NewReader(fs))
 	}
 
-	code, body, err := makeApiCall("POST", "/", bytes.NewReader(fs))
-
 	if code >= 300 || err != nil {
+		log.Printf("%s", string(body))
 		log.Fatalf("Could not upload new pixel. Status code: %d, Error: %s", code, err)
 	}
 

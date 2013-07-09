@@ -1,8 +1,11 @@
 package main
 
 import (
+	"github.com/voxelbrain/pixelpixel/protocol"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"code.google.com/p/go.net/websocket"
 	"github.com/gorilla/mux"
@@ -26,22 +29,27 @@ var (
 	}
 )
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func main() {
 	goptions.ParseAndFail(&options)
 
-	cm, events := NewContainerEvents(NewLocalContainerManager())
 	if options.Lxc {
 		log.Fatalf("LXC support not implemented yet")
 	}
 
+	pa := NewPixelApi(NewLocalContainerManager())
+
 	r := mux.NewRouter()
-	r.PathPrefix("/ws").Handler(NewStreamingHandler(cm, events))
+	r.PathPrefix("/ws").Handler(NewStreamingHandler(pa.Messages))
 	r.PathPrefix("/templates").Methods("GET").Handler(http.StripPrefix("/templates", templateRenderer{
 		Dir:  options.TemplateDir,
 		Data: TemplateData(),
 	}))
 
-	r.PathPrefix("/pixels").Handler(http.StripPrefix("/pixels", NewContainerManagerAPI(cm)))
+	r.PathPrefix("/pixels").Handler(http.StripPrefix("/pixels", pa))
 
 	r.PathPrefix("/").Methods("GET").Handler(http.FileServer(http.Dir(options.StaticDir)))
 
@@ -52,7 +60,7 @@ func main() {
 	}
 }
 
-func NewStreamingHandler(cm ContainerManager, c <-chan *Event) websocket.Handler {
+func NewStreamingHandler(c <-chan *protocol.Message) websocket.Handler {
 	f := NewFanout(c)
 	return websocket.Handler(func(c *websocket.Conn) {
 		events := f.Output()
