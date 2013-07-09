@@ -133,7 +133,7 @@ func loadKey() string {
 	if err != nil {
 		return ""
 	}
-	return string(key)
+	return strings.TrimSpace(string(key))
 }
 
 func slashify(url string) string {

@@ -81,7 +81,7 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 			for pixel := range pa.pixels {
 				websocket.JSON.Send(c, &protocol.Message{
 					Pixel: pixel,
-					Type:  protocol.TypeCreated,
+					Type:  protocol.TypeCreate,
 				})
 			}
 			for {

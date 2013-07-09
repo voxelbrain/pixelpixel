@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
+	"log"
 	"math/rand"
 	"net"
 	"net/http"
@@ -34,7 +35,7 @@ func NewPixelApi(cm ContainerManager) *PixelApi {
 	}
 	h := mux.NewRouter()
 	h.PathPrefix("/").Methods("POST").HandlerFunc(pa.CreatePixel)
-	// h.PathPrefix("/{id}/").Methods("PUT").Handler(pa.CreatePixel)
+	h.PathPrefix("/{id}/").Methods("PUT").HandlerFunc(pa.ValidatePixelId(pa.UpdatePixel))
 	// h.PathPrefix("/{id}/").Methods("DELETE").Handler(pa.CreatePixel)
 	h.PathPrefix("/{id}/content").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelContent))
 	h.PathPrefix("/{id}/logs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelLogs))
@@ -60,53 +61,103 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 
 	pa.Lock()
 	pa.container[id] = cid
-	pixelbuf := &bytes.Buffer{}
-	pa.pixels[id] = pixelbuf
+	pa.pixels[id] = &bytes.Buffer{}
 	pa.Unlock()
 
-	go func() {
-		time.Sleep(1 * time.Second)
-		addr, err := pa.cm.SocketAddress(cid)
-		if err != nil {
-			pa.Messages <- &protocol.Message{
-				Pixel:   id,
-				Type:    protocol.TypeFailure,
-				Payload: fmt.Sprintf("Could not get socket address of %s: %s", id, err),
-			}
-			return
-		}
-		c, err := net.Dial("tcp", addr)
-		if err != nil {
-			pa.Messages <- &protocol.Message{
-				Pixel:   id,
-				Type:    protocol.TypeFailure,
-				Payload: fmt.Sprintf("Could not connect to pixel %s: %s", id, err),
-			}
-			return
-		}
-		defer c.Close()
+	pa.Messages <- &protocol.Message{
+		Pixel: id,
+		Type:  protocol.TypeCreate,
+	}
 
-		pa.Messages <- &protocol.Message{
-			Pixel: id,
-			Type:  protocol.TypeCreated,
-		}
-
-		tr := tar.NewReader(c)
-		for {
-			_, err := tr.Next()
-			if err != nil {
-				break
-			}
-			pixelbuf.Reset()
-			io.Copy(pixelbuf, tr)
-			pa.Messages <- &protocol.Message{
-				Pixel: id,
-				Type:  protocol.TypeChange,
-			}
-		}
-	}()
+	go pa.pixelListener(id)
 
 	http.Error(w, id, http.StatusCreated)
+}
+
+func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	id := mux.Vars(r)["id"]
+
+	pa.RLock()
+	cid := pa.container[id]
+	pa.RUnlock()
+
+	buf := &bytes.Buffer{}
+	io.Copy(buf, r.Body)
+	if buf.Len() <= 0 {
+		http.Error(w, "Empty fs", http.StatusBadRequest)
+		return
+	}
+
+	pa.cm.DestroyContainer(cid, true)
+	<-pa.cm.WaitFor(cid)
+
+	cid, err := pa.cm.NewContainer(tar.NewReader(bytes.NewReader(buf.Bytes())), nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	pa.Lock()
+	pa.container[id] = cid
+	pa.Unlock()
+
+	pa.Messages <- &protocol.Message{
+		Pixel: id,
+		Type:  protocol.TypeChange,
+	}
+
+	go pa.pixelListener(id)
+
+	http.Error(w, id, http.StatusCreated)
+}
+
+func (pa *PixelApi) pixelListener(id string) {
+	pa.RLock()
+	cid := pa.container[id]
+	buf := pa.pixels[id]
+	pa.RUnlock()
+
+	time.Sleep(1 * time.Second)
+	addr, err := pa.cm.SocketAddress(cid)
+	if err != nil {
+		pa.Messages <- &protocol.Message{
+			Pixel:   id,
+			Type:    protocol.TypeFailure,
+			Payload: fmt.Sprintf("Could not get socket address of %s: %s", id, err),
+		}
+		return
+	}
+	c, err := net.Dial("tcp", addr)
+	if err != nil {
+		pa.Messages <- &protocol.Message{
+			Pixel:   id,
+			Type:    protocol.TypeFailure,
+			Payload: fmt.Sprintf("Could not connect to pixel %s: %s", id, err),
+		}
+		return
+	}
+	defer c.Close()
+
+	tr := tar.NewReader(c)
+	for {
+		_, err := tr.Next()
+		if err != nil {
+			log.Printf("Pixel %s closed its reader: %s", id, err)
+			pa.Messages <- &protocol.Message{
+				Pixel:   id,
+				Type:    protocol.TypeFailure,
+				Payload: err.Error(),
+			}
+			return
+		}
+		buf.Reset()
+		io.Copy(buf, tr)
+		pa.Messages <- &protocol.Message{
+			Pixel: id,
+			Type:  protocol.TypeChange,
+		}
+	}
 }
 
 func (pa *PixelApi) ValidatePixelId(h http.HandlerFunc) http.HandlerFunc {

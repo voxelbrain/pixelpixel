@@ -8,7 +8,7 @@ import (
 type MessageType int
 
 const (
-	TypeCreated MessageType = iota
+	TypeCreate MessageType = iota
 	TypeChange
 	TypeFailure
 )

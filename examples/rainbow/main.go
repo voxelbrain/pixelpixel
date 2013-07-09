@@ -53,7 +53,6 @@ func main() {
 		})
 		io.Copy(tw, buf)
 		tw.Flush()
-		time.Sleep(2 * time.Second)
+		time.Sleep(1000 * time.Millisecond)
 	}
-
 }
