@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/voxelbrain/pixelpixel/protocol"
 	"log"
 	"math/rand"
 	"net/http"
@@ -79,9 +78,9 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 
 		func() {
 			for pixel := range pa.pixels {
-				websocket.JSON.Send(c, &protocol.Message{
+				websocket.JSON.Send(c, &Message{
 					Pixel: pixel,
-					Type:  protocol.TypeCreate,
+					Type:  TypeCreate,
 				})
 			}
 			for {

@@ -12,8 +12,6 @@ import (
 	"net/http"
 	"sync"
 	"time"
-
-	"github.com/voxelbrain/pixelpixel/protocol"
 )
 
 type PixelApi struct {
@@ -21,14 +19,14 @@ type PixelApi struct {
 	container map[string]ContainerId
 	pixels    map[string]*bytes.Buffer
 	cm        ContainerManager
-	Messages  chan *protocol.Message
+	Messages  chan *Message
 	http.Handler
 }
 
 func NewPixelApi(cm ContainerManager) *PixelApi {
 	pa := &PixelApi{
 		RWMutex:   &sync.RWMutex{},
-		Messages:  make(chan *protocol.Message),
+		Messages:  make(chan *Message),
 		container: make(map[string]ContainerId),
 		pixels:    make(map[string]*bytes.Buffer),
 		cm:        cm,
@@ -64,9 +62,9 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 	pa.pixels[id] = &bytes.Buffer{}
 	pa.Unlock()
 
-	pa.Messages <- &protocol.Message{
+	pa.Messages <- &Message{
 		Pixel: id,
-		Type:  protocol.TypeCreate,
+		Type:  TypeCreate,
 	}
 
 	go pa.pixelListener(id)
@@ -102,9 +100,9 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	pa.container[id] = cid
 	pa.Unlock()
 
-	pa.Messages <- &protocol.Message{
+	pa.Messages <- &Message{
 		Pixel: id,
-		Type:  protocol.TypeChange,
+		Type:  TypeChange,
 	}
 
 	go pa.pixelListener(id)
@@ -121,18 +119,18 @@ func (pa *PixelApi) pixelListener(id string) {
 	time.Sleep(1 * time.Second)
 	addr, err := pa.cm.SocketAddress(cid)
 	if err != nil {
-		pa.Messages <- &protocol.Message{
+		pa.Messages <- &Message{
 			Pixel:   id,
-			Type:    protocol.TypeFailure,
+			Type:    TypeFailure,
 			Payload: fmt.Sprintf("Could not get socket address of %s: %s", id, err),
 		}
 		return
 	}
 	c, err := net.Dial("tcp", addr)
 	if err != nil {
-		pa.Messages <- &protocol.Message{
+		pa.Messages <- &Message{
 			Pixel:   id,
-			Type:    protocol.TypeFailure,
+			Type:    TypeFailure,
 			Payload: fmt.Sprintf("Could not connect to pixel %s: %s", id, err),
 		}
 		return
@@ -144,18 +142,18 @@ func (pa *PixelApi) pixelListener(id string) {
 		_, err := tr.Next()
 		if err != nil {
 			log.Printf("Pixel %s closed its reader: %s", id, err)
-			pa.Messages <- &protocol.Message{
+			pa.Messages <- &Message{
 				Pixel:   id,
-				Type:    protocol.TypeFailure,
+				Type:    TypeFailure,
 				Payload: err.Error(),
 			}
 			return
 		}
 		buf.Reset()
 		io.Copy(buf, tr)
-		pa.Messages <- &protocol.Message{
+		pa.Messages <- &Message{
 			Pixel: id,
-			Type:  protocol.TypeChange,
+			Type:  TypeChange,
 		}
 	}
 }
