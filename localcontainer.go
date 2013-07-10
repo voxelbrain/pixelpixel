@@ -83,8 +83,10 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	}
 
 	go func(ctr *localContainer) {
-		ctr.Cmd.Wait()
-		close(ctr.Done)
+		err := ctr.Cmd.Wait()
+		if ee, ok := err.(*exec.ExitError); !ok || ee.ProcessState.Exited() {
+			close(ctr.Done)
+		}
 	}(ctr)
 
 	lcm.m.Lock()
@@ -113,8 +115,9 @@ func (lcm *LocalContainerManager) DestroyContainer(id ContainerId, purge bool) e
 	select {
 	case <-ctr.Done:
 		// Nop
-	case <-time.After(5 * time.Second):
-		ctr.Cmd.Process.Signal(os.Kill)
+	case <-time.After(1 * time.Second):
+		ctr.Cmd.Process.Kill()
+		close(ctr.Done)
 	}
 
 	lcm.m.Lock()
@@ -132,7 +135,7 @@ func (lcm *LocalContainerManager) WaitFor(id ContainerId) chan bool {
 	ctr, ok := lcm.containers[id]
 	if !ok {
 		// Since the original channel is gone, return a new one
-		// that is closed to achieve the same effect.
+		// that is closed to signal a finished container.
 		// FIXME: This is kind of stupid, isn't it?
 		c := make(chan bool)
 		close(c)

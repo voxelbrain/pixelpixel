@@ -104,6 +104,47 @@ func TestWaitFor(t *testing.T) {
 	}
 }
 
+func TestKilling(t *testing.T) {
+	buf := makeFs(map[string]interface{}{
+		"main.go": `package main
+
+		import (
+			"time"
+			"os"
+			"os/signal"
+			"fmt"
+		)
+
+		func main() {
+			fmt.Printf("hai")
+			c := make(chan os.Signal)
+			signal.Notify(c, os.Interrupt)
+			go func() {
+				for {
+					<-c
+				}
+			}()
+			time.Sleep(10 * time.Second)
+		}`,
+	})
+	fs := tar.NewReader(bytes.NewReader(buf))
+
+	lcm := NewLocalContainerManager()
+	id, err := lcm.NewContainer(fs, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	done := lcm.WaitFor(id)
+	lcm.DestroyContainer(id, true)
+
+	select {
+	case <-done:
+		// Nop
+	case <-time.After(3 * time.Second):
+		t.Fatalf("Timeout occured")
+	}
+}
+
 func TestPurge(t *testing.T) {
 	buf := makeFs(map[string]interface{}{
 		"main.go": `package main
