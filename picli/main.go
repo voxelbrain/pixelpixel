@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"path"
@@ -39,6 +38,7 @@ func main() {
 	case "upload":
 		upload(key)
 	case "logs":
+		logs(key)
 	default:
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
@@ -52,7 +52,6 @@ func main() {
 func makeApiCall(method, subpath string, body io.Reader) (int, string, error) {
 	url := path.Join(options.Server, "pixels") + "/"
 	url = slashify(url + subpath)
-	log.Printf("URL: %s", url)
 	req, _ := http.NewRequest(method, url, body)
 	resp, err := http.DefaultClient.Do(req)
 	buf := &bytes.Buffer{}
