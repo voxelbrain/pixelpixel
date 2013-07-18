@@ -32,7 +32,7 @@ const (
 func main() {
 	fs := goptions.NewFlagSet("picli", &options)
 	err := fs.Parse(os.Args[1:])
-	key := loadKey()
+	key := prepareKey()
 
 	switch options.Verbs {
 	case "upload":
@@ -70,7 +70,7 @@ func makeApiCall(method, subpath string, body io.Reader) (int, string, error) {
 	return code, buf.String(), err
 }
 
-func loadKey() string {
+func prepareKey() string {
 	f, err := os.Open(keyFile)
 	if err != nil {
 		return ""
@@ -80,7 +80,12 @@ func loadKey() string {
 	if err != nil {
 		return ""
 	}
-	return strings.TrimSpace(string(key))
+	skey := strings.TrimSpace(string(key))
+	code, _, err := makeApiCall("GET", "/"+skey, nil)
+	if err == nil && code == http.StatusOK {
+		return skey
+	}
+	return ""
 }
 
 func slashify(url string) string {
