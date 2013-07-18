@@ -31,8 +31,8 @@ html, body {
   -moz-transition: all 1s;
   -o-transition: all 1s;
   transition: all 1s;
-  border: 30px solid #1a1a1a;
   border-color: #1a1a1a;
+  border-style: solid;
   display: inline-block;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;

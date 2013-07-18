@@ -32,8 +32,8 @@ html, body {
 		position: relative;
 		@include border-radius(10px);
 		@include single-transition(all, 1.0s);
-		border: 30px solid $p2;
 		border-color: $p2;
+		border-style: solid;
 		display: inline-block;
 		@include opacity(1);
 

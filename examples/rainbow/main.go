@@ -10,7 +10,7 @@ import (
 
 func main() {
 	time.AfterFunc(4*time.Second, func() {
-		panic("CRASH")
+		// panic("CRASH")
 	})
 	protocol.ServePixel(func(p *protocol.Pixel) {
 		for {
