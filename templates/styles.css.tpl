@@ -1,8 +1,5 @@
-body {
-	padding: {{.Spacing}}px;
-}
-
 #pixels {
+	padding: {{.Spacing}}px;
 	width: {{.TotalWidth}}px;
 }
 
