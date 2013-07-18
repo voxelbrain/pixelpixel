@@ -8,6 +8,7 @@ import (
 )
 
 const (
+	border    = 30
 	spacing   = 10
 	pixelSize = 256
 )
@@ -15,7 +16,7 @@ const (
 func TemplateData() interface{} {
 	return map[string]interface{}{
 		"NumPixelsPerRow": options.NumPixelsPerRow,
-		"Spacing":         spacing,
+		"Spacing":         spacing + border,
 		"PixelSize":       pixelSize,
 		"TotalWidth":      (pixelSize + spacing) * options.NumPixelsPerRow,
 	}

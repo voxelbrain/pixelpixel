@@ -1,0 +1,34 @@
+/* line 10, ../sass/styles.scss */
+body {
+  background-color: #060505;
+}
+
+/* line 14, ../sass/styles.scss */
+#pixels {
+  position: relative;
+  margin: 0 auto;
+  font-size: 0;
+}
+/* line 19, ../sass/styles.scss */
+#pixels .pixel {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-transition: all 1s;
+  -moz-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
+  border: 30px solid #1c1717;
+  border-color: #1c1717;
+  display: inline-block;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+/* line 27, ../sass/styles.scss */
+#pixels .pixel.error {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
+  opacity: 0.3;
+  border-color: #990000;
+}

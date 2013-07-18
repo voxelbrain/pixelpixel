@@ -1,0 +1,34 @@
+@import "compass/css3/border-radius";
+@import "compass/css3/transition";
+@import "compass/css3/opacity";
+
+
+$bg: hsla(0, 10%, 2%, 1);
+$pixelbg: hsla(0, 10%, 10%, 1);
+$pixelerrorbg: hsla(0, 100%, 30%, 1);
+
+body {
+	background-color: $bg;
+}
+
+#pixels {
+	position: relative;
+	margin: 0 auto;
+	font-size: 0;
+
+	.pixel {
+		@include border-radius(10px);
+		@include single-transition(all, 1.0s);
+		border: 30px solid $pixelbg;
+		border-color: $pixelbg;
+		display: inline-block;
+		@include opacity(1);
+
+		&.error {
+			@include opacity(0.3);
+			border-color: $pixelerrorbg;
+		}
+	}
+}
+
+

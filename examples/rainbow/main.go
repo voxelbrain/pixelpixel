@@ -17,6 +17,9 @@ var (
 )
 
 func main() {
+	time.AfterFunc(4*time.Second, func() {
+		panic("ah")
+	})
 	protocol.ServePixel(func(p *protocol.Pixel) {
 		for {
 			for _, fillColor := range colors {
