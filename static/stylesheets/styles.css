@@ -1,0 +1,103 @@
+/* line 13, ../sass/styles.scss */
+* {
+  box-sizing: border-box;
+}
+
+/* line 17, ../sass/styles.scss */
+html, body {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  background-color: black;
+  height: 100%;
+  font-family: 'Open Sans';
+}
+
+/* line 26, ../sass/styles.scss */
+#pixels {
+  margin: 0 auto;
+  font-size: 0;
+}
+/* line 30, ../sass/styles.scss */
+#pixels .pixel {
+  box-sizing: content-box;
+  position: relative;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-transition: all 1s;
+  -moz-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
+  border: 30px solid #1a1a1a;
+  border-color: #1a1a1a;
+  display: inline-block;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+  opacity: 1;
+}
+/* line 40, ../sass/styles.scss */
+#pixels .pixel.error {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
+  opacity: 0.3;
+  border-color: #990000;
+}
+
+/* line 47, ../sass/styles.scss */
+#code {
+  padding: 10px 50px;
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0 auto;
+  top: 0;
+  background-color: black;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  padding-bottom: 40px;
+}
+/* line 59, ../sass/styles.scss */
+#code h1 {
+  position: absolute;
+  right: 50px;
+  color: #1a1a1a;
+  margin: 0;
+}
+/* line 66, ../sass/styles.scss */
+#code button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  background-color: #990000;
+  border: 0;
+  padding: 0;
+}
+/* line 80, ../sass/styles.scss */
+#code select {
+  width: 30%;
+  height: 30px;
+  float: left;
+}
+/* line 85, ../sass/styles.scss */
+#code code {
+  display: block;
+  border-top: 30px solid transparent;
+  overflow-y: scroll;
+  width: 100%;
+  height: 100%;
+  color: #e6e6e6;
+  white-space: pre;
+}
+/* line 95, ../sass/styles.scss */
+#code.hidden {
+  display: none;
+}

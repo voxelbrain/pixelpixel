@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"io"
@@ -10,6 +11,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -18,6 +20,7 @@ type PixelApi struct {
 	*sync.RWMutex
 	container map[string]ContainerId
 	pixels    map[string]*bytes.Buffer
+	fs        map[string]interface{}
 	cm        ContainerManager
 	Messages  chan *Message
 	http.Handler
@@ -29,14 +32,15 @@ func NewPixelApi(cm ContainerManager) *PixelApi {
 		Messages:  make(chan *Message),
 		container: make(map[string]ContainerId),
 		pixels:    make(map[string]*bytes.Buffer),
+		fs:        make(map[string]interface{}),
 		cm:        cm,
 	}
 	h := mux.NewRouter()
 	h.PathPrefix("/").Methods("POST").HandlerFunc(pa.CreatePixel)
 	h.PathPrefix("/{id}/").Methods("PUT").HandlerFunc(pa.ValidatePixelId(pa.UpdatePixel))
-	// h.PathPrefix("/{id}/").Methods("DELETE").Handler(pa.CreatePixel)
 	h.PathPrefix("/{id}/content").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelContent))
 	h.PathPrefix("/{id}/logs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelLogs))
+	h.PathPrefix("/{id}/fs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelFs))
 	pa.Handler = h
 	return pa
 }
@@ -60,6 +64,7 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 	pa.Lock()
 	pa.container[id] = cid
 	pa.pixels[id] = &bytes.Buffer{}
+	pa.fs[id] = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
 	pa.Unlock()
 
 	pa.Messages <- &Message{
@@ -98,6 +103,7 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 
 	pa.Lock()
 	pa.container[id] = cid
+	pa.fs[id] = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
 	pa.Unlock()
 
 	pa.Messages <- &Message{
@@ -189,6 +195,17 @@ func (pa *PixelApi) GetPixelLogs(w http.ResponseWriter, r *http.Request) {
 	w.Write(logs)
 }
 
+func (pa *PixelApi) GetPixelFs(w http.ResponseWriter, r *http.Request) {
+	id := mux.Vars(r)["id"]
+
+	pa.RLock()
+	fs := pa.fs[id]
+	pa.RUnlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(fs)
+}
+
 func (pa *PixelApi) GetPixelContent(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
@@ -214,4 +231,21 @@ func (pa *PixelApi) generateId() string {
 		key[i] = chars[idx[i]]
 	}
 	return string(key)
+}
+
+func fsObject(r *tar.Reader) interface{} {
+	fs := map[string]string{}
+	for {
+		hdr, err := r.Next()
+		if err != nil {
+			break
+		}
+		if !strings.HasSuffix(hdr.Name, ".go") {
+			continue
+		}
+		buf := &bytes.Buffer{}
+		io.Copy(buf, r)
+		fs[hdr.Name] = buf.String()
+	}
+	return fs
 }

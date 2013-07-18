@@ -1,0 +1,98 @@
+@import "compass/css3/border-radius";
+@import "compass/css3/transition";
+@import "compass/css3/opacity";
+
+
+$p1: hsla(0, 0%, 0%, 1);
+$p2: hsla(0, 0%, 10%, 1);
+$p3: hsla(0, 100%, 30%, 1);
+$p4: hsla(0, 100%, 50%, 1);
+$p5: hsla(0, 100%, 80%, 1);
+$p6: hsla(0, 0%, 90%, 1);
+
+* {
+	box-sizing: border-box;
+}
+
+html, body {
+	padding: 0;
+	margin: 0;
+	position: relative;
+	background-color: $p1;
+	height: 100%;
+	font-family: 'Open Sans';
+}
+
+#pixels {
+	margin: 0 auto;
+	font-size: 0;
+
+	.pixel {
+		box-sizing: content-box;
+		position: relative;
+		@include border-radius(10px);
+		@include single-transition(all, 1.0s);
+		border: 30px solid $p2;
+		border-color: $p2;
+		display: inline-block;
+		@include opacity(1);
+
+		&.error {
+			@include opacity(0.3);
+			border-color: $p3;
+		}
+	}
+}
+
+#code {
+	padding: 10px 50px;
+	position: absolute;
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	top: 0;
+	background-color: $p1;
+	@include border-radius(5px);
+	padding-bottom: 40px;
+
+	h1 {
+		position: absolute;
+		right: 50px;
+		color: $p2;
+		margin: 0;
+	}
+
+	button {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 30px;
+		height: 30px;
+		margin-right: 10px;
+		margin-bottom: 10px;
+		background-color: $p3;
+		border: 0;
+		padding: 0;
+	}
+
+	$ssize: 30px;
+	select {
+		width: 30%;
+		height: $ssize;
+		float: left;
+	}
+	code {
+		display: block;
+		border-top: $ssize solid transparent;
+		overflow-y: scroll;
+		width: 100%;
+		height: 100%;
+		color: $p6;
+		white-space: pre;
+	}
+
+	&.hidden {
+		display: none;
+	}
+}

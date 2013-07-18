@@ -1,25 +1,78 @@
 <!doctype html>
 <head>
   <link href="/templates/styles.css" rel="stylesheet" type="text/css" />
+  <link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
 </head>
 <style>
 </style>
 <div id="pixels">
 </div>
+<div id="code" class="hidden">
+<h1></h1>
+<select></select>
+<code>
+</code>
+<button>&times;</button>
+</div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 	var ws = new WebSocket('ws://'+window.location.host+'/ws');
-	var pixels = document.querySelector('#pixels');
+	var pixels = $('#pixels');
+	var code = $('#code');
 
 	var i = 0;
 	var type_created = i++;
 	var type_change  = i++;
 	var type_failure = i++;
+	var current_id = -1;
+
+	var code_obj = {};
+
+	$(code).find('button').click(function(){
+		$(code).addClass('hidden');
+		current_id = -1;
+	});
+
+	var format_text = function(text) {
+		return text.replace(/\t/g, '  ');
+	}
+
+	var update_code = function() {
+		var key = $(code).find('select').val();
+		if(key == 'logs') {
+			$.get('//'+window.location.host+'/pixels/'+current_id+'/logs/').success(function(data) {
+				$(code).find('code').text(format_text(data));
+			});
+		} else {
+			$(code).find('code').text(format_text(code_obj[key]));
+		}
+	}
+
+	var show_code_dialog = function(id) {
+		current_id = id;
+		$(code).removeClass('hidden');
+		var s = $(code).find('select');
+		s.empty();
+		$('<option>').val('logs').text('logs').appendTo(s);
+		$.getJSON('//'+window.location.host+'/pixels/'+id+'/fs/').success(function(data) {
+			code_obj = data;
+			$.each(data, function(key, val) {
+				$('<option>').val(key).text(key).appendTo(s);
+			});
+		});
+		$(code).find('h1').text(id);
+		s.change(update_code);
+		update_code();
+	}
 
 	var create_pixel = function(id) {
 		var pixel = document.createElement('img');
-		pixel.src='http://'+window.location.host+'/pixels/'+id+'/content/';
+		pixel.src='//'+window.location.host+'/pixels/'+id+'/content/';
 		pixel.id = id;
 		pixel.className = 'pixel';
+		$(pixel).click(function() {
+			show_code_dialog(id);
+		});
 		return pixel;
 	}
 
@@ -31,14 +84,13 @@
 		console.log(event);
 		switch(event.type) {
 			case type_created:
-				pixels.appendChild(create_pixel(event.pixel));
+				pixels.append(create_pixel(event.pixel));
 			break;
 			case type_change:
-				var old_pixel = document.getElementById(event.pixel);
-				pixels.replaceChild(create_pixel(event.pixel), old_pixel);
+				$('#'+event.pixel).replaceWith(create_pixel(event.pixel));
 			break
 			case type_failure:
-				document.getElementById(event.pixel).className += ' error';
+				$('#'+event.pixel).addClass('error');
 			break
 		}
 	};
