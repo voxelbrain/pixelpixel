@@ -19,7 +19,6 @@ func upload(key string) {
 	var code int
 	var body string
 	if key != "" {
-		log.Printf("Found Pixel ID %s", key)
 		code, body, err = makeApiCall("PUT", "/"+key, bytes.NewReader(fs))
 	} else {
 		log.Printf("Creating a new pixel")
@@ -37,6 +36,7 @@ func upload(key string) {
 	}
 	defer f.Close()
 	io.WriteString(f, body)
+	log.Printf("Pixel %s uploaded", strings.TrimSpace(body))
 }
 
 func createFs(path string) ([]byte, error) {
