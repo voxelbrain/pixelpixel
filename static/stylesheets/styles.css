@@ -27,24 +27,20 @@ html, body {
   -ms-border-radius: 10px;
   -o-border-radius: 10px;
   border-radius: 10px;
-  -webkit-transition: all 1s;
-  -moz-transition: all 1s;
-  -o-transition: all 1s;
-  transition: all 1s;
+  -webkit-transition: border-color 1s;
+  -moz-transition: border-color 1s;
+  -o-transition: border-color 1s;
+  transition: border-color 1s;
   border-color: #1a1a1a;
   border-style: solid;
   display: inline-block;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
-  opacity: 1;
 }
-/* line 40, ../sass/styles.scss */
+/* line 39, ../sass/styles.scss */
 #pixels .pixel.error {
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30);
-  opacity: 0.3;
-  border-color: #990000;
+  border-color: rgba(153, 0, 0, 0.5);
 }
 
-/* line 47, ../sass/styles.scss */
+/* line 45, ../sass/styles.scss */
 #code {
   padding: 10px 50px;
   position: absolute;
@@ -61,14 +57,14 @@ html, body {
   border-radius: 5px;
   padding-bottom: 40px;
 }
-/* line 59, ../sass/styles.scss */
+/* line 57, ../sass/styles.scss */
 #code h1 {
   position: absolute;
   right: 50px;
   color: #1a1a1a;
   margin: 0;
 }
-/* line 66, ../sass/styles.scss */
+/* line 64, ../sass/styles.scss */
 #code button {
   position: absolute;
   top: 0;
@@ -81,13 +77,13 @@ html, body {
   border: 0;
   padding: 0;
 }
-/* line 80, ../sass/styles.scss */
+/* line 78, ../sass/styles.scss */
 #code select {
   width: 30%;
   height: 30px;
   float: left;
 }
-/* line 85, ../sass/styles.scss */
+/* line 83, ../sass/styles.scss */
 #code code {
   display: block;
   border-top: 30px solid transparent;
@@ -97,7 +93,7 @@ html, body {
   color: #e6e6e6;
   white-space: pre;
 }
-/* line 95, ../sass/styles.scss */
+/* line 93, ../sass/styles.scss */
 #code.hidden {
   display: none;
 }

@@ -1,24 +1,25 @@
 package main
 
 import (
-	"image"
-	"image/draw"
-	"time"
-
+	"github.com/voxelbrain/pixelpixel/imageutils"
 	"github.com/voxelbrain/pixelpixel/protocol"
 )
 
 func main() {
-	time.AfterFunc(4*time.Second, func() {
-		// panic("CRASH")
-	})
 	protocol.ServePixel(func(p *protocol.Pixel) {
-		for {
-			for _, fillColor := range colors {
-				draw.Draw(p, image.Rect(0, 0, 256, 256), &image.Uniform{fillColor}, image.Point{0, 0}, draw.Over)
-				p.Commit()
-				time.Sleep(1000 * time.Millisecond)
+		for y := 0; y < 256; y++ {
+			for x := 0; x < 256; x++ {
+				c := imageutils.HSLA{
+					H: float64(x) / 256,
+					S: 1.0,
+					L: 0.5 * (1 - float64(y)/256),
+					A: 1.0,
+				}
+				p.Set(x, y, c)
 			}
 		}
+		p.Commit()
+		// Block indefinitely
+		select {}
 	})
 }

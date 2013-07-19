@@ -48,6 +48,7 @@ func ServePixel(h PixelHandler) {
 	}
 	go commitLoop(p)
 	h(p)
+	log.Printf("Handler has returned")
 }
 
 func commitLoop(p *Pixel) {
@@ -56,12 +57,12 @@ func commitLoop(p *Pixel) {
 	for _ = range p.commit {
 		buf.Reset()
 		png.Encode(buf, p)
-		p.done <- true
 
 		tw.WriteHeader(&tar.Header{
 			Size: int64(buf.Len()),
 		})
 		io.Copy(tw, buf)
 		tw.Flush()
+		p.done <- true
 	}
 }
