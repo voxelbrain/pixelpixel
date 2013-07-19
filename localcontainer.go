@@ -83,7 +83,6 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	ctr.Cmd.Stderr = ctr.Logs
 	err = ctr.Cmd.Run()
 	if err != nil {
-		close(ctr.Done)
 		return id, nil
 	}
 
