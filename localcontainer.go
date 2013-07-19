@@ -71,13 +71,20 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	if err != nil {
 		return id, err
 	}
+
+	purge = false
+	lcm.m.Lock()
+	lcm.containers[id] = ctr
+	lcm.m.Unlock()
+
 	ctr.Cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
 	ctr.Cmd.Dir = dir
 	ctr.Cmd.Stdout = ctr.Logs
 	ctr.Cmd.Stderr = ctr.Logs
 	err = ctr.Cmd.Run()
 	if err != nil {
-		return id, err
+		close(ctr.Done)
+		return id, nil
 	}
 
 	ctr.Cmd = exec.Command(filepath.Join(dir, "pixel"))
@@ -98,11 +105,6 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 		}
 	}(ctr)
 
-	lcm.m.Lock()
-	lcm.containers[id] = ctr
-	lcm.m.Unlock()
-
-	purge = false
 	return id, nil
 }
 

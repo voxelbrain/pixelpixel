@@ -144,6 +144,15 @@ func (pa *PixelApi) pixelListener(id string) {
 	}
 	defer c.Close()
 
+	go func() {
+		<-pa.cm.WaitFor(ContainerId(id))
+		pa.Messages <- &Message{
+			Pixel:   id,
+			Type:    TypeFailure,
+			Payload: fmt.Sprintf("Pixel %s terminated", id),
+		}
+	}()
+
 	tr := tar.NewReader(c)
 	for {
 		_, err := tr.Next()
