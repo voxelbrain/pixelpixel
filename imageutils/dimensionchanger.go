@@ -30,7 +30,7 @@ func (d *dimensionChanger) Set(x, y int, c color.Color) {
 }
 
 func (d *dimensionChanger) At(x, y int) color.Color {
-	return d.At(x*d.pixel.Dx(), y*d.pixel.Dy())
+	return d.Image.At(x*d.pixel.Dx(), y*d.pixel.Dy())
 }
 
 func (d *dimensionChanger) Bounds() image.Rectangle {

@@ -27,29 +27,3 @@ func (di *DonutImage) At(x, y int) color.Color {
 	x, y = DonutCoords(x, y, di.Bounds())
 	return di.Image.At(x, y)
 }
-
-type GameBoard interface {
-	Dimensions() (int, int)
-	Get(x, y int) bool
-	Set(x, y int, alive int)
-}
-
-type ImageBoard struct {
-	img draw.Image
-}
-
-func (ib *ImageBoard) Dimensions() (int, int) {
-	return ib.img.Bounds().Dx(), ib.img.Bounds().Dy()
-}
-
-func (ib *ImageBoard) Get(x, y int) bool {
-	return ib.img.At(x, y) == color.Black
-}
-
-func (ib *ImageBoard) Set(x, y int, alive bool) {
-	c := color.White
-	if alive {
-		c = color.Black
-	}
-	ib.img.Set(x, y, c)
-}
