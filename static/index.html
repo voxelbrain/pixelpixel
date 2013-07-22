@@ -12,4 +12,9 @@
 <body>
 	<pixel-pixelwall></pixel-pixelwall>
 	<script src="/js/protocol.js"></script>
+	<script>
+		document.getElementsByTagName('pixel-pixelwall')[0].click = function(key) {
+			console.log(key);
+		};
+	</script>
 </body>
