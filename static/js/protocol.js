@@ -20,7 +20,7 @@ window.addEventListener('WebComponentsReady', function() {
 				pw.update(event.pixel);
 			break;
 			case type_failure:
-				console.log('ERROR');
+				pw.markCrashed(event.pixel);
 			break
 		}
 	};

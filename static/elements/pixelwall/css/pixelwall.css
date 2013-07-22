@@ -1,6 +1,17 @@
 pixel-pixel {
+	position: relative;
 	display: inline-block;
 	width: 256px;
 	height: 256px;
 	margin-right: 10px;
+}
+
+pixel-pixel.crashed::after {
+	position: absolute;
+	content: '';
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-image: url('../img/skull.png');
 }
