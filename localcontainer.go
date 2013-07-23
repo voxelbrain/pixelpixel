@@ -6,47 +6,30 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sync"
-	"time"
-
-	"github.com/surma-dump/gouuid"
 )
 
-type LocalContainerManager struct {
-	Root       string
-	m          *sync.Mutex
-	containers map[ContainerId]*localContainer
+type LocalContainerCreator struct {
+	Root string
 }
 
-type localContainer struct {
-	Id        ContainerId
-	Root      string
-	Cmd       *exec.Cmd
-	Done      chan bool
-	destroyed chan bool
-	Logs      *bytes.Buffer
-	Port      int
-}
-
-func NewLocalContainerManager() *LocalContainerManager {
-	r := &LocalContainerManager{
-		m:          &sync.Mutex{},
-		containers: map[ContainerId]*localContainer{},
-		Root:       filepath.Join(os.TempDir(), "pixelpixel"),
+func NewLocalContainerCreator() *LocalContainerCreator {
+	r := &LocalContainerCreator{
+		Root: filepath.Join(os.TempDir(), "pixelpixel"),
 	}
 	return r
 }
 
-func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []string) (ContainerId, error) {
-	id := ContainerId(gouuid.New().String())
-	dir := filepath.Join(lcm.Root, id.String())
+func (lcc *LocalContainerCreator) CreateContainer(fs *tar.Reader, envInjections []string) (*localContainer, error) {
+	dir := filepath.Join(lcc.Root, GenerateAlnumString(32))
 	err := os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {
-		return id, err
+		return nil, err
 	}
+
 	purge := true
 	defer func() {
 		if purge {
@@ -55,119 +38,94 @@ func (lcm *LocalContainerManager) NewContainer(fs *tar.Reader, envInjections []s
 	}()
 
 	ctr := &localContainer{
-		Id:        id,
-		Root:      dir,
-		Logs:      &bytes.Buffer{},
-		Done:      make(chan bool),
-		destroyed: make(chan bool),
+		Root:        dir,
+		LogBuffer:   &bytes.Buffer{},
+		Terminating: make(chan bool),
 	}
 
 	err = ctr.extractFileSystem(fs)
 	if err != nil {
-		return id, err
+		return nil, err
 	}
-
-	files, err := filepath.Glob(filepath.Join(dir, "*.go"))
-	if err != nil {
-		return id, err
-	}
-
 	purge = false
-	lcm.m.Lock()
-	lcm.containers[id] = ctr
-	lcm.m.Unlock()
 
-	ctr.Cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
-	ctr.Cmd.Dir = dir
-	ctr.Cmd.Stdout = ctr.Logs
-	ctr.Cmd.Stderr = ctr.Logs
-	err = ctr.Cmd.Run()
+	err = ctr.compile()
 	if err != nil {
-		return id, nil
+		return ctr, nil
 	}
 
 	ctr.Cmd = exec.Command(filepath.Join(dir, "pixel"))
 	ctr.Cmd.Dir = dir
-	ctr.Cmd.Stdout = ctr.Logs
-	ctr.Cmd.Stderr = ctr.Logs
+	ctr.Cmd.Stdout = ctr.LogBuffer
+	ctr.Cmd.Stderr = ctr.LogBuffer
 	ctr.Port = <-portGenerator
 	ctr.Cmd.Env = stringList(os.Environ(), envInjections, fmt.Sprintf("PORT=%d", ctr.Port))
 	err = ctr.Cmd.Start()
 	if err != nil {
-		return id, err
+		return ctr, err
 	}
 
-	go func(ctr *localContainer) {
-		err := ctr.Cmd.Wait()
-		if ee, ok := err.(*exec.ExitError); !ok || ee.ProcessState.Exited() {
-			close(ctr.Done)
-		}
-	}(ctr)
+	go func() {
+		ctr.Cmd.Wait()
+		close(ctr.Terminating)
+		ctr.Terminated = true
+	}()
 
-	return id, nil
+	return ctr, nil
 }
 
-func (lcm *LocalContainerManager) AllContainers() []ContainerId {
-	r := make([]ContainerId, 0, len(lcm.containers))
-	for cid := range lcm.containers {
-		r = append(r, cid)
-	}
-	return r
+type localContainer struct {
+	Root        string
+	Cmd         *exec.Cmd
+	Terminating chan bool
+	LogBuffer   *bytes.Buffer
+	Port        int
+	Terminated  bool
 }
 
-func (lcm *LocalContainerManager) DestroyContainer(id ContainerId, purge bool) error {
-	ctr, ok := lcm.containers[id]
-	if !ok {
-		return os.ErrNotExist
-	}
+func (lc *localContainer) IsRunning() bool {
+	return lc.Terminated
+}
 
-	ctr.Cmd.Process.Signal(os.Interrupt)
+func (lc *localContainer) Address() net.Addr {
+	addr, _ := net.ResolveTCPAddr("tcp4", fmt.Sprintf("localhost:%d", lc.Port))
+	return addr
+}
+
+func (lc *localContainer) Logs() string {
+	return lc.LogBuffer.String()
+}
+
+func (lc *localContainer) SoftKill() {
+	lc.Cmd.Process.Signal(os.Interrupt)
+}
+
+func (lc *localContainer) HardKill() {
+	lc.Cmd.Process.Signal(os.Kill)
+}
+
+func (lc *localContainer) Wait() {
 	select {
-	case <-ctr.Done:
-		// Nop
-	case <-time.After(1 * time.Second):
-		ctr.Cmd.Process.Kill()
-		close(ctr.Done)
+	case <-lc.Terminating:
 	}
-
-	lcm.m.Lock()
-	delete(lcm.containers, id)
-	lcm.m.Unlock()
-
-	if purge {
-		os.RemoveAll(ctr.Root)
-	}
-	close(ctr.destroyed)
-	return nil
 }
 
-func (lcm *LocalContainerManager) WaitFor(id ContainerId) chan bool {
-	ctr, ok := lcm.containers[id]
-	if !ok {
-		// Since the original channel is gone, return a new one
-		// that is closed to signal a finished container.
-		// FIXME: This is kind of stupid, isn't it?
-		c := make(chan bool)
-		close(c)
-		return c
-	}
-	return ctr.Done
+func (lc *localContainer) Cleanup() {
+	lc.Wait()
+	os.RemoveAll(lc.Root)
 }
 
-func (lcm *LocalContainerManager) Logs(id ContainerId) ([]byte, error) {
-	ctr, ok := lcm.containers[id]
-	if !ok {
-		return nil, os.ErrNotExist
+func (lc *localContainer) compile() error {
+	files, err := filepath.Glob(filepath.Join(lc.Root, "*.go"))
+	if err != nil {
+		return err
 	}
-	return ctr.Logs.Bytes(), nil
-}
 
-func (lcm *LocalContainerManager) SocketAddress(id ContainerId) (string, error) {
-	ctr, ok := lcm.containers[id]
-	if !ok {
-		return "", os.ErrNotExist
-	}
-	return fmt.Sprintf("localhost:%d", ctr.Port), nil
+	cmd := exec.Command("go", stringList("build", "-o", "pixel", files)...)
+	cmd.Dir = lc.Root
+	cmd.Stdout = lc.LogBuffer
+	cmd.Stderr = lc.LogBuffer
+	return cmd.Run()
 }
 
 func (lc *localContainer) extractFileSystem(fs *tar.Reader) error {

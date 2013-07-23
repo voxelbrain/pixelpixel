@@ -48,7 +48,7 @@ func NewPixelApi(cm ContainerManager) *PixelApi {
 
 func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	id := pa.generateId()
+	id := GenerateAlnumString(3)
 
 	buf := &bytes.Buffer{}
 	io.Copy(buf, r.Body)
@@ -240,20 +240,6 @@ func (pa *PixelApi) GetPixelContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", buf.Len()))
 	io.Copy(w, bytes.NewReader(buf.Bytes()))
-}
-
-const (
-	chars  = `abcdefghijklmnopqrstuvwxyz1234567890`
-	length = 3
-)
-
-func (pa *PixelApi) generateId() string {
-	key := make([]byte, length)
-	idx := rand.Perm(len(chars))
-	for i := 0; i < length; i++ {
-		key[i] = chars[idx[i]]
-	}
-	return string(key)
 }
 
 func fsObject(r *tar.Reader) interface{} {

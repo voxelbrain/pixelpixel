@@ -6,9 +6,13 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"reflect"
+	"sync"
 	"testing"
 	"time"
+)
+
+var (
+	lcc = NewLocalContainerCreator()
 )
 
 func TestContainerLogs(t *testing.T) {
@@ -27,15 +31,14 @@ func TestContainerLogs(t *testing.T) {
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
 
-	lcm := NewLocalContainerManager()
-	id, err := lcm.NewContainer(fs, nil)
+	ctr, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id, true)
+	defer ctr.Cleanup()
 
-	<-lcm.WaitFor(id)
-	output := lcm.containers[id].Logs.String()
+	ctr.Wait()
+	output := ctr.Logs()
 	if output != "Hello WorldHello Error" {
 		t.Fatalf("Unexpected output of container: %s", output)
 	}
@@ -63,19 +66,18 @@ func TestSubfolderHandling(t *testing.T) {
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
 
-	lcm := NewLocalContainerManager()
-	id, err := lcm.NewContainer(fs, nil)
+	ctr, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id, true)
+	defer ctr.Cleanup()
 
-	<-lcm.WaitFor(id)
-	output, err := lcm.Logs(id)
+	ctr.Wait()
+	output := ctr.Logs()
 	if err != nil {
 		t.Fatalf("Could not get logs: %s", err)
 	}
-	if string(output) != "Hello World" {
+	if output != "Hello World" {
 		t.Fatalf("Unexpected output of container: %s", output)
 	}
 }
@@ -89,60 +91,17 @@ func TestWaitFor(t *testing.T) {
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
 
-	lcm := NewLocalContainerManager()
-	id, err := lcm.NewContainer(fs, nil)
+	ctr, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id, true)
+	defer ctr.Cleanup()
 
-	select {
-	case <-lcm.WaitFor(id):
-		// Nop
-	case <-time.After(1 * time.Second):
-		t.Fatalf("Timeout occured")
-	}
-}
-
-func TestKilling(t *testing.T) {
-	buf := makeFs(map[string]interface{}{
-		"main.go": `package main
-
-		import (
-			"time"
-			"os"
-			"os/signal"
-			"fmt"
-		)
-
-		func main() {
-			fmt.Printf("hai")
-			c := make(chan os.Signal)
-			signal.Notify(c, os.Interrupt)
-			go func() {
-				for {
-					<-c
-				}
-			}()
-			time.Sleep(10 * time.Second)
-		}`,
+	timer := time.AfterFunc(1*time.Second, func() {
+		t.Fatalf("Termination timeout")
 	})
-	fs := tar.NewReader(bytes.NewReader(buf))
-
-	lcm := NewLocalContainerManager()
-	id, err := lcm.NewContainer(fs, nil)
-	if err != nil {
-		t.Fatalf("Could not start container: %s", err)
-	}
-	done := lcm.WaitFor(id)
-	lcm.DestroyContainer(id, true)
-
-	select {
-	case <-done:
-		// Nop
-	case <-time.After(3 * time.Second):
-		t.Fatalf("Timeout occured")
-	}
+	ctr.Wait()
+	timer.Stop()
 }
 
 func TestPurge(t *testing.T) {
@@ -154,47 +113,20 @@ func TestPurge(t *testing.T) {
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
 
-	lcm := NewLocalContainerManager()
-	id, err := lcm.NewContainer(fs, nil)
+	ctr, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	path := lcm.containers[id].Root
-	destroyed := lcm.containers[id].destroyed
-	lcm.DestroyContainer(id, true)
 
-	select {
-	case <-destroyed:
-		// Nop
-	case <-time.After(1 * time.Second):
+	timer := time.AfterFunc(1*time.Second, func() {
 		t.Fatalf("Timeout occured")
-	}
+	})
+	ctr.Cleanup()
+	timer.Stop()
 
-	if info, err := os.Stat(path); err == nil && info.IsDir() {
-		t.Fatalf("Folder %s was not purged", path)
+	if info, err := os.Stat(ctr.Root); err == nil && info.IsDir() {
+		t.Fatalf("Folder %s was not purged", ctr.Root)
 	}
-
-	fs = tar.NewReader(bytes.NewReader(buf))
-	id, err = lcm.NewContainer(fs, nil)
-	if err != nil {
-		t.Fatalf("Could not start container: %s", err)
-	}
-	path = lcm.containers[id].Root
-	destroyed = lcm.containers[id].destroyed
-	lcm.DestroyContainer(id, false)
-
-	select {
-	case <-destroyed:
-		// Nop
-	case <-time.After(1 * time.Second):
-		t.Fatalf("Timeout occured")
-	}
-
-	if info, err := os.Stat(path); err != nil || !info.IsDir() {
-		t.Fatalf("Folder %s was purged", path)
-	}
-
-	os.RemoveAll(path)
 }
 
 func TestTwoSequentialContainers(t *testing.T) {
@@ -207,42 +139,41 @@ func TestTwoSequentialContainers(t *testing.T) {
 
 	fs1 := tar.NewReader(bytes.NewReader(buf))
 	fs2 := tar.NewReader(bytes.NewReader(buf))
-	lcm := NewLocalContainerManager()
 
-	id1, err := lcm.NewContainer(fs1, nil)
+	ctr1, err := lcc.CreateContainer(fs1, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	lcm.DestroyContainer(id1, true)
+	go ctr1.Cleanup()
 
-	id2, err := lcm.NewContainer(fs2, nil)
+	ctr2, err := lcc.CreateContainer(fs2, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	lcm.DestroyContainer(id2, true)
+	go ctr2.Cleanup()
 
-	count := 0
-	for {
-		select {
-		case <-lcm.WaitFor(id1):
-			count++
-		case <-lcm.WaitFor(id2):
-			count++
-		case <-time.After(1 * time.Second):
-			t.Fatalf("Timeout occured")
-		}
-		if count == 2 {
-			return
-		}
-	}
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	go func() {
+		ctr1.Wait()
+		wg.Done()
+	}()
+	go func() {
+		ctr2.Wait()
+		wg.Done()
+	}()
+	timer := time.AfterFunc(1*time.Second, func() {
+		t.Fatalf("Timeout occured")
+	})
+	wg.Wait()
+	timer.Stop()
 }
 
 func TestInvalidTar(t *testing.T) {
 	data := bytes.NewReader([]byte(`This is obivously not a valid tar`))
 	fs := tar.NewReader(data)
 
-	lcm := NewLocalContainerManager()
-	_, err := lcm.NewContainer(fs, nil)
+	_, err := lcc.CreateContainer(fs, nil)
 	if err == nil {
 		t.Fatalf("Corrupted tar file was accepted")
 	}
@@ -258,64 +189,43 @@ func TestPortAssignment(t *testing.T) {
 		)
 
 		func main() {
-			fmt.Printf("localhost:%s", os.Getenv("PORT"))
+			fmt.Printf("127.0.0.1:%s", os.Getenv("PORT"))
 		}`,
 	})
 	fs := tar.NewReader(bytes.NewReader(buf))
 
-	lcm := NewLocalContainerManager()
-	id1, err := lcm.NewContainer(fs, nil)
+	ctr1, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id1, true)
+	go ctr1.Cleanup()
 
-	select {
-	case <-lcm.WaitFor(id1):
-		// Nop
-	case <-time.After(1 * time.Second):
+	timer := time.AfterFunc(1*time.Second, func() {
 		t.Fatalf("Timeout occured")
-	}
+	})
+	ctr1.Wait()
+	timer.Stop()
 
 	fs = tar.NewReader(bytes.NewReader(buf))
-	id2, err := lcm.NewContainer(fs, nil)
+	ctr2, err := lcc.CreateContainer(fs, nil)
 	if err != nil {
 		t.Fatalf("Could not start container: %s", err)
 	}
-	defer lcm.DestroyContainer(id2, true)
+	go ctr2.Cleanup()
 
-	select {
-	case <-lcm.WaitFor(id2):
-		// Nop
-	case <-time.After(1 * time.Second):
+	timer = time.AfterFunc(1*time.Second, func() {
 		t.Fatalf("Timeout occured")
-	}
+	})
+	ctr2.Wait()
+	timer.Stop()
 
-	logs1, err := lcm.Logs(id1)
-	if err != nil {
-		t.Fatalf("Could not get logs: %s", err)
+	if ctr1.Logs() != ctr1.Address().String() {
+		t.Fatalf("Specified and injected ports differ. Injected %s, got %s", ctr1.Address(), ctr1.Logs())
 	}
-	port1, err := lcm.SocketAddress(id1)
-	if err != nil {
-		t.Fatalf("Could not get port: %s", err)
+	if ctr2.Logs() != ctr2.Address().String() {
+		t.Fatalf("Specified and injected ports differ. Injected %s, got %s", ctr2.Address(), ctr2.Logs())
 	}
-	if string(logs1) != port1 {
-		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port1, logs1)
-	}
-
-	logs2, err := lcm.Logs(id2)
-	if err != nil {
-		t.Fatalf("Could not get logs: %s", err)
-	}
-	port2, err := lcm.SocketAddress(id2)
-	if err != nil {
-		t.Fatalf("Could not get port: %s", err)
-	}
-	if string(logs2) != port2 {
-		t.Fatalf("Specified and injected ports differ. Injected %d, got %s", port2, logs2)
-	}
-
-	if reflect.DeepEqual(logs1, logs2) {
+	if ctr1.Logs() == ctr2.Logs() {
 		t.Fatalf("Same port was assigned")
 	}
 }
