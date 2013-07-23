@@ -24,3 +24,7 @@ pixel-codeinspector {
   padding: 50px 100px;
   color: #cccccc;
 }
+/* line 27, ../sass/styles.scss */
+pixel-codeinspector.hidden {
+  display: none;
+}

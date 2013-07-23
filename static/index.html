@@ -15,14 +15,16 @@
 </head>
 <body>
 	<pixel-pixelwall></pixel-pixelwall>
-	<pixel-codeinspector key="o3e"></pixel-codeinspector>
+	<pixel-codeinspector class="hidden"></pixel-codeinspector>
 	<script src="/js/protocol.js"></script>
 	<script>
+		var ci = document.getElementsByTagName('pixel-codeinspector')[0];
 		document.getElementsByTagName('pixel-pixelwall')[0].click = function(key) {
-			console.log(key);
+			ci.key = key;
+			ci.className = '';
 		};
 		document.getElementsByTagName('pixel-codeinspector')[0].close = function() {
-			console.log('close');
+			ci.className = 'hidden';
 		};
 	</script>
 </body>
