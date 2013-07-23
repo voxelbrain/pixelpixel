@@ -1,9 +1,9 @@
-/* line 13, ../sass/styles.scss */
+/* line 5, ../sass/styles.scss */
 * {
   box-sizing: border-box;
 }
 
-/* line 17, ../sass/styles.scss */
+/* line 9, ../sass/styles.scss */
 html, body {
   padding: 0;
   margin: 0;
@@ -13,87 +13,18 @@ html, body {
   font-family: 'Open Sans';
 }
 
-/* line 26, ../sass/styles.scss */
-#pixels {
-  margin: 0 auto;
-  font-size: 0;
-}
-/* line 30, ../sass/styles.scss */
-#pixels .pixel {
-  box-sizing: content-box;
-  position: relative;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
-  border-radius: 10px;
-  -webkit-transition: border-color 1s;
-  -moz-transition: border-color 1s;
-  -o-transition: border-color 1s;
-  transition: border-color 1s;
-  border-color: #1a1a1a;
-  border-style: solid;
-  display: inline-block;
-}
-/* line 39, ../sass/styles.scss */
-#pixels .pixel.error {
-  border-color: rgba(153, 0, 0, 0.5);
-}
-
-/* line 45, ../sass/styles.scss */
-#code {
-  padding: 10px 50px;
+/* line 18, ../sass/styles.scss */
+pixel-codeinspector {
   position: absolute;
-  display: block;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  margin: 0 auto;
-  top: 0;
   background-color: black;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
-  -o-border-radius: 5px;
-  border-radius: 5px;
-  padding-bottom: 40px;
+  padding: 50px 100px;
+  color: #cccccc;
 }
-/* line 57, ../sass/styles.scss */
-#code h1 {
-  position: absolute;
-  right: 50px;
-  color: #1a1a1a;
-  margin: 0;
-}
-/* line 64, ../sass/styles.scss */
-#code button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  background-color: #990000;
-  border: 0;
-  padding: 0;
-}
-/* line 78, ../sass/styles.scss */
-#code select {
-  width: 30%;
-  height: 30px;
-  float: left;
-}
-/* line 83, ../sass/styles.scss */
-#code code {
-  display: block;
-  border-top: 30px solid transparent;
-  overflow-y: scroll;
-  width: 100%;
-  height: 100%;
-  color: #e6e6e6;
-  white-space: pre;
-}
-/* line 93, ../sass/styles.scss */
-#code.hidden {
+/* line 27, ../sass/styles.scss */
+pixel-codeinspector.hidden {
   display: none;
 }

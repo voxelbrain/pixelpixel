@@ -1,0 +1,44 @@
+<polymer-element name="pixel-pixelwall" attributes="pixels">
+	<template>
+		<link href="css/pixelwall.css" rel="stylesheet" type="text/css" />
+		<div id="container">
+		</div>
+	</template>
+	<script>
+		Polymer('pixel-pixelwall', {
+			pixelInstances: {},
+			addPixel: function(pixel) {
+				this.pixelInstances[pixel.id] = pixel;
+				this.$.container.appendChild(pixel);
+			},
+			pixels: '',
+			pixelsChanged: function() {
+				var pixelnames = this.pixels.trim().split(" ");
+				for(var i in pixelnames) {
+					if(pixelnames[i] in this.pixelInstances) {
+						continue;
+					}
+					pixel = document.createElement('pixel-pixel')
+					pixel.id = pixelnames[i];
+					pixel.key = pixelnames[i];
+					pixel.addEventListener('click', function(key) {
+						this.click(key);
+					}.bind(this, pixelnames[i]));
+					this.addPixel(pixel);
+				}
+			},
+			update: function(key) {
+				if(key in this.pixelInstances) {
+					this.pixelInstances[key].update();
+					this.pixelInstances[key].className = '';
+				}
+			},
+			markCrashed: function(key) {
+				if(key in this.pixelInstances) {
+					this.pixelInstances[key].className = 'crashed';
+				}
+			},
+			click: function(key) {}
+		});
+	</script>
+</polymer-element>

@@ -1,0 +1,26 @@
+<script src="js/zlib.js"></script>
+<script src="js/png.js"></script>
+<polymer-element name="pixel-pixel" attributes="key">
+	<template>
+		<link href="css/pixel.css" rel="stylesheet" type="text/css" />
+		<div>
+			<header>{{key}}</header>
+			<canvas id="canvas"></canvas>
+			<footer></footer>
+		</div>
+	</template>
+	<script>
+		Polymer('pixel-pixel', {
+			key: '',
+			update: function() {
+				PNG.load('/pixels/'+this.key+'/content', this.$.canvas);
+			},
+			ready: function() {
+				this.update();
+			},
+			keyChanged: function() {
+				this.update();
+			},
+		});
+	</script>
+</polymer-element>

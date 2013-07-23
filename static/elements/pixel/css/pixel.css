@@ -1,0 +1,9 @@
+div {
+	display: inline-block;
+}
+
+header {
+	text-align: right;
+	margin: 4px 0;
+	color: hsla(0, 0%, 20%, 1);
+}
