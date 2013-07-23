@@ -24,7 +24,12 @@
 		Polymer('pixel-codeinspector', {
 			key: '',
 			files: {},
+			empty: function() {
+				removeAllChildren(this.$.files);
+				this.$.code.innerText = '';
+			},
 			keyChanged: function() {
+				this.empty();
 				$.get('/pixels/'+this.key+'/fs').success(function(data) {
 					this.files = data;
 					$.get('/pixels/'+this.key+'/logs').success(function(data) {
@@ -34,7 +39,6 @@
 				}.bind(this));
 			},
 			updateTabs: function() {
-				removeAllChildren(this.$.files);
 				this.$.files.appendChild(newTabNode('Logs'));
 				for(var file in this.files) {
 					if(file == 'Logs') {
@@ -51,7 +55,6 @@
 					content = this.files[file];
 				}
 				this.$.code.innerText = content;
-
 			},
 			close: function() {},
 			ready: function() {
