@@ -1,9 +1,7 @@
 pixel-pixel {
 	position: relative;
 	display: inline-block;
-	width: 256px;
-	height: 256px;
-	margin-right: 10px;
+	margin: 0 20px;
 }
 
 pixel-pixel.crashed::after {

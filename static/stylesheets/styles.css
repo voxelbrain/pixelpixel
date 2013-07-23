@@ -1,9 +1,9 @@
-/* line 13, ../sass/styles.scss */
+/* line 5, ../sass/styles.scss */
 * {
   box-sizing: border-box;
 }
 
-/* line 17, ../sass/styles.scss */
+/* line 9, ../sass/styles.scss */
 html, body {
   padding: 0;
   margin: 0;
@@ -11,4 +11,16 @@ html, body {
   background-color: black;
   height: 100%;
   font-family: 'Open Sans';
+}
+
+/* line 18, ../sass/styles.scss */
+pixel-codeinspector {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  padding: 50px 100px;
+  color: #cccccc;
 }

@@ -8,13 +8,21 @@
 
     <link rel="import" href="/elements/pixel/pixel.html">
     <link rel="import" href="/elements/pixelwall/pixelwall.html">
+    <link rel="import" href="/elements/codeinspector/codeinspector.html">
+    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-tabs/polymer-ui-tabs.html">
+    <link rel="import" href="/elements/polymer-elements/polymer-selector/polymer-selector.html">
+    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-splitter/polymer-ui-splitter.html">
 </head>
 <body>
 	<pixel-pixelwall></pixel-pixelwall>
+	<pixel-codeinspector key="o3e"></pixel-codeinspector>
 	<script src="/js/protocol.js"></script>
 	<script>
 		document.getElementsByTagName('pixel-pixelwall')[0].click = function(key) {
 			console.log(key);
+		};
+		document.getElementsByTagName('pixel-codeinspector')[0].close = function() {
+			console.log('close');
 		};
 	</script>
 </body>

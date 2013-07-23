@@ -2,7 +2,12 @@
 <script src="js/png.js"></script>
 <polymer-element name="pixel-pixel" attributes="key">
 	<template>
-		<canvas id="canvas"></canvas>
+		<link href="css/pixel.css" rel="stylesheet" type="text/css" />
+		<div>
+			<header>{{key}}</header>
+			<canvas id="canvas"></canvas>
+			<footer></footer>
+		</div>
 	</template>
 	<script>
 		Polymer('pixel-pixel', {
