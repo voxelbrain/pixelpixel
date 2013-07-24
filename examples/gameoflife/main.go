@@ -17,15 +17,16 @@ func init() {
 }
 
 func main() {
-	protocol.ServePixel(func(p *protocol.Pixel) {
-		board := &ImageBoard{&DonutImage{imageutils.DimensionChanger(p, Size, Size)}}
-		initBoard(board)
-		for {
-			p.Commit()
-			NextGen(board)
-			time.Sleep(300 * time.Millisecond)
-		}
-	})
+	c := protocol.PixelPusher()
+	img := protocol.NewPixel()
+
+	board := &ImageBoard{&DonutImage{imageutils.DimensionChanger(img, Size, Size)}}
+	initBoard(board)
+	for {
+		c <- img
+		NextGen(board)
+		time.Sleep(300 * time.Millisecond)
+	}
 }
 
 func initBoard(b GameBoard) {
