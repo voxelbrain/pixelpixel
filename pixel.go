@@ -42,7 +42,7 @@ func NewPixelApi(cc ContainerCreator) *PixelApi {
 	h.PathPrefix("/{id}/content").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelContent))
 	h.PathPrefix("/{id}/logs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelLogs))
 	h.PathPrefix("/{id}/fs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelFs))
-	h.PathPrefix("/{id}/").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.CheckPixel))
+	h.PathPrefix("/{id}/").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.Success))
 	h.PathPrefix("/{id}/").Methods("PUT").HandlerFunc(pa.ValidatePixelId(pa.UpdatePixel))
 	pa.Handler = h
 	return pa
@@ -189,16 +189,8 @@ func (pa *PixelApi) ValidatePixelId(h http.HandlerFunc) http.HandlerFunc {
 	})
 }
 
-func (pa *PixelApi) CheckPixel(w http.ResponseWriter, r *http.Request) {
-	pa.RLock()
-	pixel := pa.pixels[mux.Vars(r)["id"]]
-	pa.RUnlock()
-
-	if pixel.IsRunning() {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-	w.WriteHeader(http.StatusServiceUnavailable)
+func (pa *PixelApi) Success(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func (pa *PixelApi) GetPixelLogs(w http.ResponseWriter, r *http.Request) {
