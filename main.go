@@ -77,21 +77,29 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 		}()
 
 		func() {
-			for pixel := range pa.pixels {
+			pa.RLock()
+			defer pa.RUnlock()
+			for _, pixel := range pa.pixels {
 				websocket.JSON.Send(c, &Message{
-					Pixel: pixel,
+					Pixel: pixel.Id,
 					Type:  TypeCreate,
 				})
-			}
-			for {
-				select {
-				case message, ok := <-messages:
-					if !ok {
-						return
-					}
-					websocket.JSON.Send(c, message)
+				if !pixel.IsRunning() {
+					websocket.JSON.Send(c, &Message{
+						Pixel: pixel.Id,
+						Type:  TypeFailure,
+					})
 				}
 			}
 		}()
+		for {
+			select {
+			case message, ok := <-messages:
+				if !ok {
+					return
+				}
+				websocket.JSON.Send(c, message)
+			}
+		}
 	})
 }
