@@ -1,4 +1,4 @@
-package imageutils
+package pixelutils
 
 var (
 	// This is the 4x6 mini font from the Linux Kernel

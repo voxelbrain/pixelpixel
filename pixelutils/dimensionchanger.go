@@ -1,4 +1,4 @@
-package imageutils
+package pixelutils
 
 import (
 	"image"

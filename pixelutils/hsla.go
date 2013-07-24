@@ -1,4 +1,4 @@
-package imageutils
+package pixelutils
 
 // This code is a modified version of github.com/bthomson/go-color
 

@@ -1,17 +1,16 @@
 package main
 
 import (
-	"github.com/voxelbrain/pixelpixel/imageutils"
-	"github.com/voxelbrain/pixelpixel/protocol"
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 func main() {
-	c := protocol.PixelPusher()
+	c := pixelutils.PixelPusher()
 
-	img := protocol.NewPixel()
+	img := pixelutils.NewPixel()
 	for y := 0; y < 256; y++ {
 		for x := 0; x < 256; x++ {
-			c := imageutils.HSLA{
+			c := pixelutils.HSLA{
 				H: float64(x) / 256,
 				S: 1.0,
 				L: 0.5 * (1 - float64(y)/256),

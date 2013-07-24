@@ -4,8 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/voxelbrain/pixelpixel/imageutils"
-	"github.com/voxelbrain/pixelpixel/protocol"
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 const (
@@ -17,10 +16,10 @@ func init() {
 }
 
 func main() {
-	c := protocol.PixelPusher()
-	img := protocol.NewPixel()
+	c := pixelutils.PixelPusher()
+	img := pixelutils.NewPixel()
 
-	board := &ImageBoard{&DonutImage{imageutils.DimensionChanger(img, Size, Size)}}
+	board := &ImageBoard{&DonutImage{pixelutils.DimensionChanger(img, Size, Size)}}
 	initBoard(board)
 	for {
 		c <- img

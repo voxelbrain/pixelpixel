@@ -5,24 +5,23 @@ import (
 	"image"
 	"time"
 
-	"github.com/voxelbrain/pixelpixel/imageutils"
-	"github.com/voxelbrain/pixelpixel/protocol"
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 func main() {
-	c := protocol.PixelPusher()
-	img := protocol.NewPixel()
+	c := pixelutils.PixelPusher()
+	img := pixelutils.NewPixel()
 
-	dImg := imageutils.DimensionChanger(img, 4, 6)
+	dImg := pixelutils.DimensionChanger(img, 4, 6)
 	for i := 0; i < 5; i++ {
-		color := imageutils.Green
+		color := pixelutils.Green
 		if i > 3 {
 			panic("CRASH")
 		} else if i == 3 {
-			color = imageutils.Red
+			color = pixelutils.Red
 		}
-		imageutils.FillRectangle(dImg, image.Rect(0, 0, 4, 6), imageutils.Black)
-		imageutils.DrawText(dImg, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
+		pixelutils.FillRectangle(dImg, image.Rect(0, 0, 4, 6), pixelutils.Black)
+		pixelutils.DrawText(dImg, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
 		c <- img
 		time.Sleep(1 * time.Second)
 	}
