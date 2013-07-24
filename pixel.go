@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/mux"
 	"io"
 	"log"
-	"math/rand"
 	"net"
 	"net/http"
 	"strings"
@@ -16,24 +15,27 @@ import (
 	"time"
 )
 
+type Pixel struct {
+	Id string
+	Container
+	Filesystem map[string]string
+	LastImage  *bytes.Buffer
+}
+
 type PixelApi struct {
 	*sync.RWMutex
-	container map[string]ContainerId
-	pixels    map[string]*bytes.Buffer
-	fs        map[string]interface{}
-	cm        ContainerManager
-	Messages  chan *Message
+	pixels   map[string]*Pixel
+	cc       ContainerCreator
+	Messages chan *Message
 	http.Handler
 }
 
-func NewPixelApi(cm ContainerManager) *PixelApi {
+func NewPixelApi(cc ContainerCreator) *PixelApi {
 	pa := &PixelApi{
-		RWMutex:   &sync.RWMutex{},
-		Messages:  make(chan *Message),
-		container: make(map[string]ContainerId),
-		pixels:    make(map[string]*bytes.Buffer),
-		fs:        make(map[string]interface{}),
-		cm:        cm,
+		RWMutex:  &sync.RWMutex{},
+		Messages: make(chan *Message),
+		pixels:   make(map[string]*Pixel),
+		cc:       cc,
 	}
 	h := mux.NewRouter()
 	h.PathPrefix("/").Methods("POST").HandlerFunc(pa.CreatePixel)
@@ -56,16 +58,21 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Empty fs", http.StatusBadRequest)
 		return
 	}
-	cid, err := pa.cm.NewContainer(tar.NewReader(bytes.NewReader(buf.Bytes())), nil)
+	ctr, err := pa.cc.CreateContainer(tar.NewReader(bytes.NewReader(buf.Bytes())), nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	pixel := &Pixel{
+		Id:         id,
+		Container:  ctr,
+		Filesystem: fsObject(tar.NewReader(bytes.NewReader(buf.Bytes()))),
+		LastImage:  blackPixel,
+	}
+
 	pa.Lock()
-	pa.container[id] = cid
-	pa.pixels[id] = &bytes.Buffer{}
-	pa.fs[id] = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
+	pa.pixels[id] = pixel
 	pa.Unlock()
 
 	pa.Messages <- &Message{
@@ -73,7 +80,7 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 		Type:  TypeCreate,
 	}
 
-	go pa.pixelListener(id)
+	go pa.pixelListener(pixel)
 
 	http.Error(w, id, http.StatusCreated)
 }
@@ -83,7 +90,7 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 
 	pa.RLock()
-	cid := pa.container[id]
+	pixel := pa.pixels[id]
 	pa.RUnlock()
 
 	buf := &bytes.Buffer{}
@@ -93,47 +100,33 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pa.cm.DestroyContainer(cid, true)
-	<-pa.cm.WaitFor(cid)
-
-	cid, err := pa.cm.NewContainer(tar.NewReader(bytes.NewReader(buf.Bytes())), nil)
+	ctr, err := pa.cc.CreateContainer(tar.NewReader(bytes.NewReader(buf.Bytes())), nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	pa.Lock()
-	pa.container[id] = cid
-	pa.fs[id] = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
-	pa.Unlock()
+	StopContainer(pixel.Container)
+	pixel.Container = ctr
+	pixel.Filesystem = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
+	pixel.LastImage = blackPixel
 
 	pa.Messages <- &Message{
 		Pixel: id,
 		Type:  TypeChange,
 	}
 
-	go pa.pixelListener(id)
+	go pa.pixelListener(pixel)
 
 	http.Error(w, id, http.StatusCreated)
 }
 
-func (pa *PixelApi) pixelListener(id string) {
-	pa.RLock()
-	cid := pa.container[id]
-	buf := pa.pixels[id]
-	pa.RUnlock()
-
+func (pa *PixelApi) pixelListener(pixel *Pixel) {
+	id := pixel.Id
+	// FIXME: Arbitrary wait to accomodate startup
 	time.Sleep(1 * time.Second)
-	addr, err := pa.cm.SocketAddress(cid)
-	if err != nil {
-		pa.Messages <- &Message{
-			Pixel:   id,
-			Type:    TypeFailure,
-			Payload: fmt.Sprintf("Could not get socket address of %s: %s", id, err),
-		}
-		return
-	}
-	c, err := net.Dial("tcp", addr)
+	addr := pixel.Address()
+	c, err := net.Dial("tcp", addr.String())
 	if err != nil {
 		pa.Messages <- &Message{
 			Pixel:   id,
@@ -145,7 +138,7 @@ func (pa *PixelApi) pixelListener(id string) {
 	defer c.Close()
 
 	go func() {
-		<-pa.cm.WaitFor(ContainerId(id))
+		pixel.Wait()
 		pa.Messages <- &Message{
 			Pixel:   id,
 			Type:    TypeFailure,
@@ -165,8 +158,8 @@ func (pa *PixelApi) pixelListener(id string) {
 			}
 			return
 		}
-		buf.Reset()
-		io.Copy(buf, tr)
+		pixel.LastImage.Reset()
+		io.Copy(pixel.LastImage, tr)
 		pa.Messages <- &Message{
 			Pixel: id,
 			Type:  TypeChange,
@@ -184,7 +177,7 @@ func (pa *PixelApi) ValidatePixelId(h http.HandlerFunc) http.HandlerFunc {
 		}
 
 		pa.RLock()
-		_, ok = pa.container[id]
+		_, ok = pa.pixels[id]
 		pa.RUnlock()
 		if !ok {
 			http.Error(w, "No such pixel", http.StatusBadRequest)
@@ -195,54 +188,46 @@ func (pa *PixelApi) ValidatePixelId(h http.HandlerFunc) http.HandlerFunc {
 }
 
 func (pa *PixelApi) CheckPixel(w http.ResponseWriter, r *http.Request) {
-	cid := pa.container[mux.Vars(r)["id"]]
+	pa.RLock()
+	pixel := pa.pixels[mux.Vars(r)["id"]]
+	pa.RUnlock()
 
-	ctrs := pa.cm.AllContainers()
-	for _, ctr := range ctrs {
-		if ctr == cid {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+	if pixel.IsRunning() {
+		w.WriteHeader(http.StatusOK)
+		return
 	}
 	w.WriteHeader(http.StatusNotFound)
 }
 
 func (pa *PixelApi) GetPixelLogs(w http.ResponseWriter, r *http.Request) {
-	cid := pa.container[mux.Vars(r)["id"]]
+	pa.RLock()
+	pixel := pa.pixels[mux.Vars(r)["id"]]
+	pa.RUnlock()
 
-	logs, err := pa.cm.Logs(cid)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write(logs)
+	io.WriteString(w, pixel.Logs())
 }
 
 func (pa *PixelApi) GetPixelFs(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-
 	pa.RLock()
-	fs := pa.fs[id]
+	pixel := pa.pixels[mux.Vars(r)["id"]]
 	pa.RUnlock()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(fs)
+	json.NewEncoder(w).Encode(pixel.Filesystem)
 }
 
 func (pa *PixelApi) GetPixelContent(w http.ResponseWriter, r *http.Request) {
-	id := mux.Vars(r)["id"]
-
 	pa.RLock()
-	buf := pa.pixels[id]
+	pixel := pa.pixels[mux.Vars(r)["id"]]
 	pa.RUnlock()
 
 	w.Header().Set("cache-control", "private, max-age=0, no-cache")
 	w.Header().Set("Content-Type", "image/png")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", buf.Len()))
-	io.Copy(w, bytes.NewReader(buf.Bytes()))
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", pixel.LastImage.Len()))
+	io.Copy(w, bytes.NewReader(pixel.LastImage.Bytes()))
 }
 
-func fsObject(r *tar.Reader) interface{} {
+func fsObject(r *tar.Reader) map[string]string {
 	fs := map[string]string{}
 	for {
 		hdr, err := r.Next()

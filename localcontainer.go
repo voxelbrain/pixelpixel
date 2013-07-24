@@ -23,7 +23,7 @@ func NewLocalContainerCreator() *LocalContainerCreator {
 	return r
 }
 
-func (lcc *LocalContainerCreator) CreateContainer(fs *tar.Reader, envInjections []string) (*localContainer, error) {
+func (lcc *LocalContainerCreator) CreateContainer(fs *tar.Reader, envInjections []string) (Container, error) {
 	dir := filepath.Join(lcc.Root, GenerateAlnumString(32))
 	err := os.MkdirAll(dir, os.FileMode(0755))
 	if err != nil {

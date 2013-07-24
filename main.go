@@ -39,7 +39,7 @@ func main() {
 		log.Fatalf("LXC support not implemented yet")
 	}
 
-	pa := NewPixelApi(NewLocalContainerManager())
+	pa := NewPixelApi(NewLocalContainerCreator())
 
 	r := mux.NewRouter()
 	r.PathPrefix("/ws").Handler(NewStreamingHandler(pa))
