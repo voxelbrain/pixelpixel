@@ -198,7 +198,7 @@ func (pa *PixelApi) CheckPixel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	w.WriteHeader(http.StatusNotFound)
+	w.WriteHeader(http.StatusServiceUnavailable)
 }
 
 func (pa *PixelApi) GetPixelLogs(w http.ResponseWriter, r *http.Request) {
