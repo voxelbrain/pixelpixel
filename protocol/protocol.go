@@ -13,21 +13,11 @@ import (
 	"os"
 )
 
-type PixelHandler func(p *Pixel)
-
-type Pixel struct {
-	draw.Image
-	commit chan bool
-	done   chan bool
-	rwc    io.ReadWriteCloser
+func NewPixel() draw.Image {
+	return image.NewRGBA(image.Rect(0, 0, 256, 256))
 }
 
-func (p *Pixel) Commit() {
-	p.commit <- true
-	<-p.done
-}
-
-func ServePixel(h PixelHandler) {
+func PixelPusher() chan<- image.Image {
 	addr := fmt.Sprintf("localhost:%s", os.Getenv("PORT"))
 	log.Printf("Starting pixel on %s", addr)
 	l, err := net.Listen("tcp", addr)
@@ -39,30 +29,25 @@ func ServePixel(h PixelHandler) {
 	if err != nil {
 		log.Fatalf("Could not accept connection: %s", err)
 	}
-	defer c.Close()
-	p := &Pixel{
-		Image:  image.NewRGBA(image.Rect(0, 0, 256, 256)),
-		commit: make(chan bool),
-		done:   make(chan bool),
-		rwc:    c,
-	}
-	go commitLoop(p)
-	h(p)
-	log.Printf("Handler has returned")
+
+	return commitLoop(c)
 }
 
-func commitLoop(p *Pixel) {
-	buf := &bytes.Buffer{}
-	tw := tar.NewWriter(p.rwc)
-	for _ = range p.commit {
-		buf.Reset()
-		png.Encode(buf, p)
+func commitLoop(w io.WriteCloser) chan<- image.Image {
+	c := make(chan image.Image)
+	go func() {
+		buf := &bytes.Buffer{}
+		tw := tar.NewWriter(w)
+		for img := range c {
+			buf.Reset()
+			png.Encode(buf, img)
 
-		tw.WriteHeader(&tar.Header{
-			Size: int64(buf.Len()),
-		})
-		io.Copy(tw, buf)
-		tw.Flush()
-		p.done <- true
-	}
+			tw.WriteHeader(&tar.Header{
+				Size: int64(buf.Len()),
+			})
+			io.Copy(tw, buf)
+			tw.Flush()
+		}
+	}()
+	return c
 }
