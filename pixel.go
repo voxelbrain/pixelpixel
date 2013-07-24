@@ -68,8 +68,9 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 		Id:         id,
 		Container:  ctr,
 		Filesystem: fsObject(tar.NewReader(bytes.NewReader(buf.Bytes()))),
-		LastImage:  blackPixel,
+		LastImage:  &bytes.Buffer{},
 	}
+	io.Copy(pixel.LastImage, bytes.NewReader(blackPixel.Bytes()))
 
 	pa.Lock()
 	pa.pixels[id] = pixel
@@ -109,7 +110,8 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	StopContainer(pixel.Container)
 	pixel.Container = ctr
 	pixel.Filesystem = fsObject(tar.NewReader(bytes.NewReader(buf.Bytes())))
-	pixel.LastImage = blackPixel
+	pixel.LastImage = &bytes.Buffer{}
+	io.Copy(pixel.LastImage, bytes.NewReader(blackPixel.Bytes()))
 
 	pa.Messages <- &Message{
 		Pixel: id,
