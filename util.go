@@ -1,7 +1,11 @@
 package main
 
 import (
+	"archive/tar"
+	"bytes"
+	"io"
 	"math/rand"
+	"path/filepath"
 	"time"
 )
 
@@ -25,4 +29,35 @@ func StopContainer(ctr Container) {
 	})
 	ctr.Wait()
 	timer.Stop()
+}
+
+func makeFs(fs map[string]interface{}) []byte {
+	buf := &bytes.Buffer{}
+	w := tar.NewWriter(buf)
+	makeFsPrefix(w, "", fs)
+	w.Close()
+	return buf.Bytes()
+}
+
+func makeFsPrefix(w *tar.Writer, prefix string, fs map[string]interface{}) {
+	for item, content := range fs {
+		path := filepath.Join(prefix, item)
+		switch x := content.(type) {
+		case string:
+			w.WriteHeader(&tar.Header{
+				Name:     path,
+				Typeflag: tar.TypeReg,
+				Size:     int64(len([]byte(x))),
+			})
+			io.WriteString(w, x)
+		case map[string]interface{}:
+			w.WriteHeader(&tar.Header{
+				Name:     path,
+				Typeflag: tar.TypeDir,
+			})
+			makeFsPrefix(w, path, x)
+		default:
+			panic("Invalid item type in Fs declaration")
+		}
+	}
 }

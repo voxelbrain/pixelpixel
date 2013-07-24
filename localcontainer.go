@@ -84,7 +84,7 @@ type localContainer struct {
 }
 
 func (lc *localContainer) IsRunning() bool {
-	return lc.Terminated
+	return !lc.Terminated
 }
 
 func (lc *localContainer) Address() net.Addr {

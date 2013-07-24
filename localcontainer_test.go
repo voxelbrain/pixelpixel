@@ -3,9 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
-	"io"
 	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -124,8 +122,8 @@ func TestPurge(t *testing.T) {
 	ctr.Cleanup()
 	timer.Stop()
 
-	if info, err := os.Stat(ctr.Root); err == nil && info.IsDir() {
-		t.Fatalf("Folder %s was not purged", ctr.Root)
+	if info, err := os.Stat(ctr.(*localContainer).Root); err == nil && info.IsDir() {
+		t.Fatalf("Folder %s was not purged", ctr.(*localContainer).Root)
 	}
 }
 
@@ -230,33 +228,31 @@ func TestPortAssignment(t *testing.T) {
 	}
 }
 
-func makeFs(fs map[string]interface{}) []byte {
-	buf := &bytes.Buffer{}
-	w := tar.NewWriter(buf)
-	makeFsPrefix(w, "", fs)
-	w.Close()
-	return buf.Bytes()
-}
+func TestIsRunning(t *testing.T) {
+	buf := makeFs(map[string]interface{}{
+		"main.go": `package main
 
-func makeFsPrefix(w *tar.Writer, prefix string, fs map[string]interface{}) {
-	for item, content := range fs {
-		path := filepath.Join(prefix, item)
-		switch x := content.(type) {
-		case string:
-			w.WriteHeader(&tar.Header{
-				Name:     path,
-				Typeflag: tar.TypeReg,
-				Size:     int64(len([]byte(x))),
-			})
-			io.WriteString(w, x)
-		case map[string]interface{}:
-			w.WriteHeader(&tar.Header{
-				Name:     path,
-				Typeflag: tar.TypeDir,
-			})
-			makeFsPrefix(w, path, x)
-		default:
-			panic("Invalid item type in Fs declaration")
-		}
+		func main() {
+			panic("CRASH")
+		}`,
+	})
+	fs := tar.NewReader(bytes.NewReader(buf))
+
+	ctr, err := lcc.CreateContainer(fs, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
 	}
+	defer ctr.Cleanup()
+
+	if !ctr.IsRunning() {
+		t.Fatalf("Container has IsRunning() = false after start")
+	}
+	timer := time.AfterFunc(1*time.Second, func() {
+		t.Fatalf("Termination timeout")
+	})
+	ctr.Wait()
+	if ctr.IsRunning() {
+		t.Fatalf("Container has IsRunning() = true after Wait()")
+	}
+	timer.Stop()
 }
