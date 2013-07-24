@@ -19,12 +19,12 @@
 	<script src="/js/protocol.js"></script>
 	<script>
 		var ci = document.getElementsByTagName('pixel-codeinspector')[0];
-		document.getElementsByTagName('pixel-pixelwall')[0].click = function(key) {
-			ci.key = key;
+		document.getElementsByTagName('pixel-pixelwall')[0].addEventListener('pixelClick', function(ev) {
+			ci.key = ev.detail.key;
 			ci.className = '';
-		};
-		document.getElementsByTagName('pixel-codeinspector')[0].close = function() {
+		});
+		document.getElementsByTagName('pixel-codeinspector')[0].addEventListener('close', function() {
 			ci.className = 'hidden';
-		};
+		});
 	</script>
 </body>

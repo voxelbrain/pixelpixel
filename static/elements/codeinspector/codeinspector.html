@@ -56,7 +56,6 @@
 				}
 				this.$.code.innerText = content;
 			},
-			close: function() {},
 			ready: function() {
 				var oldFn = this.$.files.selectedChanged.bind(this.$.files);
 				this.$.files.selectedChanged = function() {
@@ -64,7 +63,7 @@
 					this.updateContent();
 				}.bind(this);
 				this.$.close.addEventListener('click', function() {
-					this.close();
+					this.fire('close');
 				}.bind(this))
 			},
 		});

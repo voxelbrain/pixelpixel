@@ -22,7 +22,7 @@
 					pixel.id = pixelnames[i];
 					pixel.key = pixelnames[i];
 					pixel.addEventListener('click', function(key) {
-						this.click(key);
+						this.fire('pixelClick', {key: key});
 					}.bind(this, pixelnames[i]));
 					this.addPixel(pixel);
 				}
@@ -38,7 +38,6 @@
 					this.pixelInstances[key].className = 'crashed';
 				}
 			},
-			click: function(key) {}
 		});
 	</script>
 </polymer-element>
