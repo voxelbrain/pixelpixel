@@ -97,10 +97,16 @@ func (lc *localContainer) Logs() string {
 }
 
 func (lc *localContainer) SoftKill() {
+	if !lc.IsRunning() || lc.Cmd == nil || lc.Cmd.Process == nil {
+		return
+	}
 	lc.Cmd.Process.Signal(os.Interrupt)
 }
 
 func (lc *localContainer) HardKill() {
+	if !lc.IsRunning() || lc.Cmd == nil || lc.Cmd.Process == nil {
+		return
+	}
 	lc.Cmd.Process.Signal(os.Kill)
 }
 
