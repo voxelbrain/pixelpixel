@@ -30,30 +30,32 @@ func (lcc *LocalContainerCreator) CreateContainer(fs *tar.Reader, envInjections 
 		return nil, err
 	}
 
-	purge := true
-	defer func() {
-		if purge {
-			os.RemoveAll(dir)
-		}
-	}()
-
 	ctr := &localContainer{
 		Root:        dir,
 		LogBuffer:   &bytes.Buffer{},
 		Terminating: make(chan bool),
 	}
 
+	purge := true
+	defer func() {
+		if purge {
+			close(ctr.Terminating)
+			ctr.Terminated = true
+			os.RemoveAll(dir)
+		}
+	}()
+
 	err = ctr.extractFileSystem(fs)
 	if err != nil {
 		return nil, err
 	}
-	purge = false
 
 	err = ctr.compile()
 	if err != nil {
 		return ctr, nil
 	}
 
+	purge = false
 	ctr.Cmd = exec.Command(filepath.Join(dir, "pixel"))
 	ctr.Cmd.Dir = dir
 	ctr.Cmd.Stdout = ctr.LogBuffer

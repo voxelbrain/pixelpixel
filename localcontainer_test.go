@@ -256,3 +256,26 @@ func TestIsRunning(t *testing.T) {
 	}
 	timer.Stop()
 }
+
+func TestInvalidCode(t *testing.T) {
+	buf := makeFs(map[string]interface{}{
+		"main.go": `package main
+
+		func main() {
+			asdfsdafsafwhatisthis?
+		}`,
+	})
+	fs := tar.NewReader(bytes.NewReader(buf))
+
+	ctr, err := lcc.CreateContainer(fs, nil)
+	if err != nil {
+		t.Fatalf("Could not start container: %s", err)
+	}
+	defer ctr.Cleanup()
+
+	timer := time.AfterFunc(1*time.Second, func() {
+		t.Fatalf("Termination timeout")
+	})
+	ctr.Wait()
+	timer.Stop()
+}
