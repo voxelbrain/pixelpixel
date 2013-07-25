@@ -21,6 +21,7 @@
 		var ci = document.getElementsByTagName('pixel-codeinspector')[0];
 		document.getElementsByTagName('pixel-pixelwall')[0].addEventListener('pixelClick', function(ev) {
 			ci.key = ev.detail.key;
+			ci.reload();
 			ci.className = '';
 		});
 		document.getElementsByTagName('pixel-codeinspector')[0].addEventListener('close', function() {
