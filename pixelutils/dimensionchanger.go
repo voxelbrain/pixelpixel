@@ -26,11 +26,11 @@ func DimensionChanger(img draw.Image, w, h int) draw.Image {
 }
 
 func (d *dimensionChanger) Set(x, y int, c color.Color) {
-	draw.Draw(d.Image, d.pixel.Add(image.Point{x * d.pixel.Dx(), y * d.pixel.Dy()}), &image.Uniform{c}, image.Point{0, 0}, draw.Over)
+	draw.Draw(d.Image, d.pixel.Add(image.Point{x * d.pixel.Dx(), y * d.pixel.Dy()}).Add(d.Image.Bounds().Canon().Min), &image.Uniform{c}, image.Point{0, 0}, draw.Over)
 }
 
 func (d *dimensionChanger) At(x, y int) color.Color {
-	return d.Image.At(x*d.pixel.Dx(), y*d.pixel.Dy())
+	return d.Image.At(x*d.pixel.Dx()+d.Image.Bounds().Canon().Min.X, y*d.pixel.Dy()+d.Image.Bounds().Canon().Min.Y)
 }
 
 func (d *dimensionChanger) Bounds() image.Rectangle {

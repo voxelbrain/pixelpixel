@@ -23,7 +23,6 @@ func main() {
 		log.Fatalf("Could not open Twitter stream: %s", err)
 	}
 	for tweet := range tweets {
-		log.Printf("%#v", tweet)
 		pixelutils.FillRectangle(pixel, pixel.Bounds(), pixelutils.Black)
 		pic := tweet.Author.ProfilePicture
 		pixelutils.Copy(pixel, pic, pic.Bounds(), pixel.Bounds())
