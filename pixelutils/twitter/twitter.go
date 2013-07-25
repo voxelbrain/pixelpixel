@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/araddon/goauth"
@@ -32,13 +31,13 @@ type Tweet struct {
 }
 
 type Credentials struct {
-	ConsumerKey    string
-	ConsumerSecret string
-	AccessToken    string
-	AccessSecret   string
+	ConsumerKey    string `json:"consumer_key"`
+	ConsumerSecret string `json:"consumer_secret"`
+	AccessToken    string `json:"access_token"`
+	AccessSecret   string `json:"access_secret"`
 }
 
-func Hashtags(cred *Credentials, Hashtag string) <-chan *Tweet {
+func Hashtags(cred *Credentials, Hashtag string) (<-chan *Tweet, error) {
 	c := make(chan *Tweet)
 	restclient := twittergo.NewClient(&oauth1a.ClientConfig{
 		ConsumerKey:    cred.ConsumerKey,
@@ -61,11 +60,24 @@ func Hashtags(cred *Credentials, Hashtag string) <-chan *Tweet {
 	if err != nil {
 		close(c)
 	}
-	return c
+	return c, err
 }
 
 func newChannelConverter(c chan *Tweet, client *twittergo.Client) func([]byte) {
+	rateLimitActive := false
+	timer := time.AfterFunc(10*time.Second, func() {
+		rateLimitActive = false
+	})
+	timer.Stop()
+
 	return func(data []byte) {
+		if rateLimitActive {
+			return
+		}
+
+		rateLimitActive = true
+		timer.Reset(10 * time.Second)
+
 		var tweet twittergo.Tweet
 		err := json.Unmarshal(data, &tweet)
 		if err != nil {
@@ -73,7 +85,7 @@ func newChannelConverter(c chan *Tweet, client *twittergo.Client) func([]byte) {
 			return
 		}
 
-		profileImageUrl, err := getUserProfileImageURL(client, tweet.User().ScreenName())
+		profileImageUrl, err := getUserProfileImageURL(client, tweet.User().Id())
 		if err != nil {
 			log.Printf("Could not get users profile image url: %s", err)
 			return
@@ -99,8 +111,8 @@ type user struct {
 	ProfileImageUrl string `json:"profile_image_url"`
 }
 
-func getUserProfileImageURL(client *twittergo.Client, screenName string) (string, error) {
-	req, err := http.NewRequest("GET", "/1.1/users/show.json", strings.NewReader(fmt.Sprintf("screen_name=%s", screenName)))
+func getUserProfileImageURL(client *twittergo.Client, userId uint64) (string, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.twitter.com/1.1/users/show.json?user_id=%d", userId), nil)
 	if err != nil {
 		return "", err
 	}
@@ -109,8 +121,10 @@ func getUserProfileImageURL(client *twittergo.Client, screenName string) (string
 	if err != nil {
 		return "", err
 	}
+	defer resp.Body.Close()
+
 	var u user
-	err = resp.Parse(&u)
+	err = json.NewDecoder(resp.Body).Decode(&u)
 	if err != nil {
 		return "", err
 	}
