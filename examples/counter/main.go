@@ -11,7 +11,7 @@ func main() {
 	pixel := pixelutils.NewPixel()
 	grid := pixelutils.DimensionChanger(pixel, 3*4, 3*6)
 	for i := 1; i <= 9; i++ {
-		pixelutils.FillRectangle(grid, image.Rect(0, 0, 3*4, 3*6), pixelutils.Black)
+		pixelutils.Empty(grid)
 		pixelutils.DrawText(grid, image.Rect(0, 0, 3*4, 3*6), pixelutils.Red, "123456789"[0:i])
 		c <- pixel
 		time.Sleep(1 * time.Second)
