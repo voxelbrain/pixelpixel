@@ -20,7 +20,7 @@ func main() {
 		} else if i == 3 {
 			color = pixelutils.Red
 		}
-		pixelutils.FillRectangle(dImg, image.Rect(0, 0, 4, 6), pixelutils.Black)
+		pixelutils.Empty(dImg)
 		pixelutils.DrawText(dImg, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
 		c <- img
 		time.Sleep(1 * time.Second)

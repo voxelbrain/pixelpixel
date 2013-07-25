@@ -1,12 +1,17 @@
 <polymer-element name="pixel-codeinspector" attributes="key">
 	<template>
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
-		<header>{{key}}</header>
 		<polymer-ui-tabs id="files" valueattr="innerText">
 		</polymer-ui-tabs>
 		<code id="code">
 		</code>
-		<i id="close">&times;</i>
+
+		<div class="icon" id="close">
+			<div class="cross"></div>
+		</div>
+		<div class="icon" id="reload">
+			<div class="reload"></div>
+		</div>
 	</template>
 	<script>
 		function removeAllChildren(node) {
@@ -25,18 +30,9 @@
 			key: '',
 			files: {},
 			empty: function() {
+				this.files = {};
 				removeAllChildren(this.$.files);
 				this.$.code.innerText = '';
-			},
-			keyChanged: function() {
-				this.empty();
-				$.get('/pixels/'+this.key+'/fs').success(function(data) {
-					this.files = data;
-					$.get('/pixels/'+this.key+'/logs').success(function(data) {
-						this.files['Logs'] = data;
-						this.updateTabs();
-					}.bind(this));
-				}.bind(this));
 			},
 			updateTabs: function() {
 				this.$.files.appendChild(newTabNode('Logs'));
@@ -56,6 +52,22 @@
 				}
 				this.$.code.innerText = content;
 			},
+			reloadFiles: function() {
+				$.get('/pixels/'+this.key+'/fs').success(function(data) {
+					this.files = data;
+					$.get('/pixels/'+this.key+'/logs').success(function(data) {
+						this.files['Logs'] = data;
+						this.updateTabs();
+					}.bind(this));
+				}.bind(this));
+			},
+			reload: function() {
+				this.empty();
+				this.reloadFiles();
+			},
+			keyChanged: function() {
+				this.reload();
+			},
 			ready: function() {
 				var oldFn = this.$.files.selectedChanged.bind(this.$.files);
 				this.$.files.selectedChanged = function() {
@@ -64,6 +76,9 @@
 				}.bind(this);
 				this.$.close.addEventListener('click', function() {
 					this.fire('close');
+				}.bind(this))
+				this.$.reload.addEventListener('click', function() {
+					this.reload();
 				}.bind(this))
 			},
 		});

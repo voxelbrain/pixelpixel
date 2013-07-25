@@ -3,12 +3,6 @@ polymer-ui-tabs {
 	margin-bottom: 10px;
 }
 
-header {
-	color: hsla(0, 0%, 20%, 1);
-	text-align: right;
-	float: right;
-}
-
 code {
 	color: inherit;
 	display: block;
@@ -17,17 +11,93 @@ code {
 	height: 90%;
 }
 
-i {
-	display: block;
+div.icon {
+    height: 32px;
+    width: 32px;
+    position: relative;
+    margin: 15px;
+    overflow: hidden;
+    display: inline-block;
+}
+
+div.icon {
 	position: absolute;
-	width: 50px;
-	height: 50px;
-	background-color: red;
-	text-align: center;
-	line-height: 50px;
-	font-size: 50px;
-	color: black;
-	top: 0;
-	right: 0;
 	cursor: pointer;
+	top: 0;
+}
+
+#close {
+	right: 0;
+}
+
+#reload{
+	right: 60px;
+}
+
+div.icon div.reload {
+    width: 18px;
+    height: 9px;
+    border-style: solid;
+    border-width: 0px 4px 4px 4px;
+    border-color: #333;
+    -webkit-border-radius: 0 0 50px 50px;
+    -moz-border-radius: 0 0 50px 50px;
+    border-radius: 0 0 50px 50px;
+    position: absolute;
+    top: 18px;
+    left: 2px;
+}
+
+div.icon div.reload:after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-style: solid;
+    border-width: 4px 0 0 4px;
+    border-color: #333;
+    -webkit-border-radius: 50px 0 0 0;
+    -moz-border-radius: 50px 0 0 0;
+    border-radius: 50px 0 0 0;
+    position: absolute;
+    left: -4px;
+    bottom: 9px;
+}
+
+div.icon div.reload:before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px;
+    border-color: transparent transparent transparent #333;
+    bottom: 14px;
+    left: 9px;
+}
+
+div.icon div.cross {
+    width: 25px;
+    height: 4px;
+    background: #333;
+    margin: 15px 0 0 4px;
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+div.icon div.cross:after {
+    content: '';
+    width: 25px;
+    height: 4px;
+    background: #333;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    transform: rotate(90deg);
 }
