@@ -10,9 +10,9 @@ import (
 
 func main() {
 	c := pixelutils.PixelPusher()
-	img := pixelutils.NewPixel()
+	pixel := pixelutils.NewPixel()
 
-	dImg := pixelutils.DimensionChanger(img, 4, 6)
+	bigPixel := pixelutils.DimensionChanger(pixel, 4, 6)
 	for i := 0; i < 5; i++ {
 		color := pixelutils.Green
 		if i > 3 {
@@ -20,9 +20,9 @@ func main() {
 		} else if i == 3 {
 			color = pixelutils.Red
 		}
-		pixelutils.Empty(dImg)
-		pixelutils.DrawText(dImg, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
-		c <- img
+		pixelutils.Empty(bigPixel)
+		pixelutils.DrawText(bigPixel, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
+		c <- pixel
 		time.Sleep(1 * time.Second)
 	}
 }

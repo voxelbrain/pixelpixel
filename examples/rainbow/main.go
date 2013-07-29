@@ -6,8 +6,8 @@ import (
 
 func main() {
 	c := pixelutils.PixelPusher()
+	pixel := pixelutils.NewPixel()
 
-	img := pixelutils.NewPixel()
 	for y := 0; y < 256; y++ {
 		for x := 0; x < 256; x++ {
 			c := pixelutils.HSLA{
@@ -16,11 +16,11 @@ func main() {
 				L: 0.5 * (1 - float64(y)/256),
 				A: 1.0,
 			}
-			img.Set(x, y, c)
+			pixel.Set(x, y, c)
 		}
 	}
 
-	c <- img
+	c <- pixel
 
 	// Block indefinitely
 	select {}

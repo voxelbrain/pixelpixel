@@ -17,12 +17,12 @@ func init() {
 
 func main() {
 	c := pixelutils.PixelPusher()
-	img := pixelutils.NewPixel()
+	pixel := pixelutils.NewPixel()
 
-	board := &ImageBoard{&DonutImage{pixelutils.DimensionChanger(img, Size, Size)}}
+	board := &ImageBoard{&DonutImage{pixelutils.DimensionChanger(pixel, Size, Size)}}
 	initBoard(board)
 	for {
-		c <- img
+		c <- pixel
 		NextGen(board)
 		time.Sleep(300 * time.Millisecond)
 	}
