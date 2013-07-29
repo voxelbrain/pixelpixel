@@ -13,11 +13,16 @@ import (
 	"os"
 )
 
-func NewPixel() draw.Image {
+type Pixel interface {
+	draw.Image
+	SubImage(r image.Rectangle) image.Image
+}
+
+func NewPixel() Pixel {
 	return image.NewRGBA(image.Rect(0, 0, 256, 256))
 }
 
-func PixelPusher() chan<- image.Image {
+func PixelPusher() chan<- Pixel {
 	addr := fmt.Sprintf("localhost:%s", os.Getenv("PORT"))
 	log.Printf("Starting pixel on %s", addr)
 	l, err := net.Listen("tcp", addr)
@@ -33,8 +38,8 @@ func PixelPusher() chan<- image.Image {
 	return commitLoop(c)
 }
 
-func commitLoop(w io.WriteCloser) chan<- image.Image {
-	c := make(chan image.Image)
+func commitLoop(w io.WriteCloser) chan<- Pixel {
+	c := make(chan Pixel)
 	go func() {
 		buf := &bytes.Buffer{}
 		tw := tar.NewWriter(w)
