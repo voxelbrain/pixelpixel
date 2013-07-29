@@ -14,6 +14,10 @@ const (
 	URL = `http://i.imgur.com/0VEDr0t.jpg`
 )
 
+var (
+	translucentBlack = pixelutils.Black
+)
+
 func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
@@ -24,10 +28,12 @@ func main() {
 	pixelutils.Copy(pixel, bigImage, bigImage.Bounds(), pixel.Bounds())
 	convDuration := time.Now().Sub(start)
 
-	textArea := pixelutils.DimensionChanger(pixel, 64, 64)
-	r := textArea.Bounds()
+	textArea := pixelutils.SubPixel(pixel, pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8))
+	pixelutils.FillRectangle(textArea, textArea.Bounds(), translucentBlack)
+	textArea = pixelutils.DimensionChanger(textArea, 60, 6).(pixelutils.Pixel)
 	text := fmt.Sprintf("Conv: %s", convDuration)
-	pixelutils.DrawText(textArea, image.Rect(r.Min.X, r.Max.Y-6, r.Max.X, r.Max.Y), pixelutils.Red, text)
+	pixelutils.DrawText(textArea, textArea.Bounds(), pixelutils.Red, text)
+
 	c <- pixel
 	select {}
 }
@@ -44,4 +50,8 @@ func downloadImage() image.Image {
 		log.Fatalf("Could not decoe image: %s", err)
 	}
 	return img
+}
+
+func init() {
+	translucentBlack.A = 150
 }
