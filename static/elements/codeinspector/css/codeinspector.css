@@ -3,14 +3,6 @@ polymer-ui-tabs {
 	margin-bottom: 10px;
 }
 
-code {
-	color: inherit;
-	display: block;
-	white-space: pre;
-	overflow-y: scroll;
-	height: 90%;
-}
-
 div.icon {
     height: 32px;
     width: 32px;
