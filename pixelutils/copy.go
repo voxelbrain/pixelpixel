@@ -13,3 +13,7 @@ func Copy(dst draw.Image, src image.Image, sr, dr image.Rectangle) {
 	resizeImg, _ := resample.Resize(image.Point{dr.Dx(), dr.Dy()}, subImg)
 	draw.Draw(dst, dr, resizeImg, image.Point{0, 0}, draw.Over)
 }
+
+func SubPixel(pixel Pixel, r image.Rectangle) Pixel {
+	return pixel.SubImage(r).(Pixel)
+}
