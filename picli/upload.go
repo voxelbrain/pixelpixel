@@ -49,14 +49,14 @@ func createFs(path string) ([]byte, error) {
 		log.Printf("Adding %s", path)
 		if info.IsDir() {
 			err := fs.WriteHeader(&tar.Header{
-				Name:     info.Name(),
+				Name:     path,
 				Typeflag: tar.TypeDir,
 			})
 			return err
 		}
 
 		err := fs.WriteHeader(&tar.Header{
-			Name:     info.Name(),
+			Name:     path,
 			Mode:     int64(info.Mode()),
 			Size:     info.Size(),
 			Typeflag: tar.TypeReg,
