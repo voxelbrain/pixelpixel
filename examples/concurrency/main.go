@@ -4,30 +4,34 @@ import (
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 	"image"
 	"image/color"
+	"image/draw"
 	"time"
 )
 
-var (
-	c     = pixelutils.PixelPusher()
-	pixel = pixelutils.NewPixel()
-)
-
 func main() {
+	pusher := pixelutils.PixelPusher()
+	pixel := pixelutils.NewPixel()
 
-	sub1 := pixelutils.SubPixel(pixel, image.Rect(0, 0, 128, 256))
-	sub2 := pixelutils.SubPixel(pixel, image.Rect(128, 0, 256, 256))
+	sub1 := pixelutils.SubImage(pixel, image.Rect(0, 0, 128, 256))
+	sub2 := pixelutils.SubImage(pixel, image.Rect(128, 0, 256, 256))
 
-	go Blinker(sub1, 901*time.Millisecond, pixelutils.Red, pixelutils.Green)
-	go Blinker(sub2, 307*time.Millisecond, pixelutils.Yellow, pixelutils.Cyan, pixelutils.Magenta)
+	c := make(chan draw.Image)
+	go Blinker(c, sub1, 901*time.Millisecond, pixelutils.Red, pixelutils.Green)
+	go Blinker(c, sub2, 307*time.Millisecond, pixelutils.Yellow, pixelutils.Cyan, pixelutils.Magenta)
+	go func() {
+		for _ = range c {
+			pusher <- pixel
+		}
+	}()
 
 	// Block indefinitely
 	select {}
 }
 
-func Blinker(spixel pixelutils.Pixel, sleep time.Duration, colors ...color.Color) {
+func Blinker(c chan<- draw.Image, pixel draw.Image, sleep time.Duration, colors ...color.Color) {
 	for {
 		for _, color := range colors {
-			pixelutils.Fill(spixel, color)
+			pixelutils.Fill(pixel, color)
 			c <- pixel
 			time.Sleep(sleep)
 		}
