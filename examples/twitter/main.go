@@ -6,15 +6,34 @@ import (
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 	"github.com/voxelbrain/pixelpixel/pixelutils/twitter"
 	"image"
+	"image/color"
+	"image/draw"
 	_ "image/png"
 	"log"
 	"os"
 )
 
-const (
-	windowsImage = `imgs/windows.png`
-	osxImage     = `imgs/osx.png`
-	ubuntuImage  = `imgs/ubuntu.png`
+type TweetSection struct {
+	BackgroundImage string
+	Hashtag         string
+}
+
+var (
+	TweetSections = []TweetSection{
+		{
+			BackgroundImage: `imgs/windows.png`,
+			Hashtag:         "#Windows",
+		},
+		// {
+		// 	BackgroundImage: `imgs/osx.png`,
+		// 	Hashtag:         "#OSX",
+		// },
+		// {
+		// 	BackgroundImage: `imgs/ubuntu.png`,
+		// 	Hashtag:         "#Ubuntu",
+		// },
+	}
+	translucentBlack = color.RGBA{0, 0, 0, 230}
 )
 
 func main() {
@@ -25,30 +44,44 @@ func main() {
 
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
-	windowsPixel := pixelutils.SubImage(pixel, image.Rect(0, 0*85, 256, 1*85))
-	osxPixel := pixelutils.SubImage(pixel, image.Rect(0, 1*85, 256, 2*85))
-	ubuntuPixel := pixelutils.SubImage(pixel, image.Rect(0, 2*85, 256, 3*85))
 
-	pixelutils.Resize(windowsPixel, loadImage(windowsImage))
-	pixelutils.Resize(osxPixel, loadImage(osxImage))
-	pixelutils.Resize(ubuntuPixel, loadImage(ubuntuImage))
+	fakeC := make(chan draw.Image)
+	for i, section := range TweetSections {
+		subPixel := pixelutils.SubImage(pixel, image.Rect(0, i*85, 256, (i+1)*85))
 
-	c <- pixel
-	select {}
+		pixelutils.Resize(subPixel, loadImage(section.BackgroundImage))
+		pixelutils.Fill(subPixel, translucentBlack)
+		tweets, err := twitter.Hashtags(cred, section.Hashtag)
+		if err != nil {
+			log.Printf("Could not start tweet streamer for hashtag \"%s\": %s", section.Hashtag, err)
+			continue
+		}
+		go TweetDrawer(fakeC, subPixel, tweets)
 
-	tweets, err := twitter.Hashtags(cred, "#OSX")
-	if err != nil {
-		log.Fatalf("Could not open Twitter stream: %s", err)
 	}
-	for tweet := range tweets {
-		pixelutils.Fill(pixel, pixelutils.Black)
-		pic := tweet.Author.ProfilePicture
-		pixelutils.Resize(pixel, pic)
-		text := fmt.Sprintf("%s (@%s):\n%s", tweet.Author.Name, tweet.Author.ScreenName, tweet.Text)
-		pixelutils.DrawText(pixel, pixelutils.Red, text)
+	for _ = range fakeC {
 		c <- pixel
 	}
+}
 
+func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.Tweet) {
+	bg := image.NewNRGBA(pixel.Bounds())
+	pixelutils.Resize(bg, pixel)
+	c <- pixel
+	avatarArea := pixelutils.SubImage(pixel, image.Rectangle{
+		Min: pixel.Bounds().Min,
+		Max: pixel.Bounds().Min.Add(image.Point{85, 85}),
+	})
+	textArea := pixelutils.PixelSizeChanger(pixelutils.SubImage(pixel, image.Rectangle{
+		Min: pixel.Bounds().Min.Add(image.Point{85, 0}),
+		Max: pixel.Bounds().Max,
+	}), 2, 2)
+	for tweet := range tweets {
+		pixelutils.Resize(pixel, bg)
+		pixelutils.Resize(avatarArea, tweet.Author.ProfilePicture)
+		pixelutils.DrawText(textArea, pixelutils.White, tweet.Text)
+		c <- pixel
+	}
 }
 
 func loadImage(path string) image.Image {
