@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 	"github.com/voxelbrain/pixelpixel/pixelutils/twitter"
 	"image"
@@ -33,19 +32,15 @@ var (
 		// 	Hashtag:         "#Ubuntu",
 		// },
 	}
-	translucentBlack = color.RGBA{0, 0, 0, 230}
+	translucentBlack = color.RGBA{0, 0, 0, 200}
 )
 
 func main() {
-	cred, err := loadCredentials()
-	if err != nil {
-		log.Fatalf("Could not load credentials: %s", err)
-	}
-
+	cred := loadCredentials()
+	fakeC := make(chan draw.Image)
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
-	fakeC := make(chan draw.Image)
 	for i, section := range TweetSections {
 		subPixel := pixelutils.SubImage(pixel, image.Rect(0, i*85, 256, (i+1)*85))
 
@@ -73,7 +68,7 @@ func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.T
 		Max: pixel.Bounds().Min.Add(image.Point{85, 85}),
 	})
 	textArea := pixelutils.PixelSizeChanger(pixelutils.SubImage(pixel, image.Rectangle{
-		Min: pixel.Bounds().Min.Add(image.Point{85, 0}),
+		Min: pixel.Bounds().Min.Add(image.Point{90, 0}),
 		Max: pixel.Bounds().Max,
 	}), 2, 2)
 	for tweet := range tweets {
@@ -87,24 +82,27 @@ func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.T
 func loadImage(path string) image.Image {
 	f, err := os.Open(path)
 	if err != nil {
-		panic(fmt.Sprintf("Could not open hard-coded source image: %s", err))
+		log.Fatalf("Could not open hard-coded source image: %s", err)
 	}
 	defer f.Close()
 	img, _, err := image.Decode(f)
 	if err != nil {
-		panic(fmt.Sprintf("Could not decode hard-coded source image: %s", err))
+		log.Fatalf("Could not decode hard-coded source image: %s", err)
 	}
 	return img
 }
 
-func loadCredentials() (*twitter.Credentials, error) {
+func loadCredentials() *twitter.Credentials {
 	f, err := os.Open("credentials.json")
 	if err != nil {
-		return nil, err
+		log.Fatalf("Could not open credentials file: %s", err)
 	}
 	defer f.Close()
 
 	var cred *twitter.Credentials
 	err = json.NewDecoder(f).Decode(&cred)
-	return cred, err
+	if err != nil {
+		log.Fatalf("Could not decode credentials file: %s", err)
+	}
+	return cred
 }
