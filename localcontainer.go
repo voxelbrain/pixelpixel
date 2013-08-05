@@ -124,15 +124,21 @@ func (lc *localContainer) Cleanup() {
 }
 
 func (lc *localContainer) compile() error {
+	cmd := exec.Command("go", "get", "-d")
+	cmd.Dir = lc.Root
+	cmd.Stdout = lc.LogBuffer
+	cmd.Stderr = lc.LogBuffer
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
 	files, err := filepath.Glob(filepath.Join(lc.Root, "*.go"))
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command("go", stringList("build", "-o", "pixel", files)...)
+	cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
 	cmd.Dir = lc.Root
-	cmd.Stdout = lc.LogBuffer
-	cmd.Stderr = lc.LogBuffer
 	return cmd.Run()
 }
 
