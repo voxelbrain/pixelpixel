@@ -28,11 +28,11 @@ func main() {
 	pixelutils.Resize(pixel, bigImage)
 	convDuration := time.Now().Sub(start)
 
-	textArea := pixelutils.SubPixel(pixel, pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8))
-	pixelutils.Fill(textArea, translucentBlack)
-	textArea = pixelutils.DimensionChanger(textArea, 60, 6).(pixelutils.Pixel)
-	text := fmt.Sprintf("Conv: %s", convDuration)
-	pixelutils.DrawText(textArea, pixelutils.Red, text)
+	textArea := pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8)
+	text := pixelutils.NewImageWriter(pixelutils.DimensionChanger(pixelutils.SubPixel(pixel, textArea), 60, 6), pixelutils.Red)
+
+	pixelutils.Fill(text, translucentBlack)
+	fmt.Fprintf(text, "Conv: %s", convDuration)
 
 	c <- pixel
 	select {}

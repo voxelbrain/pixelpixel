@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/voxelbrain/pixelpixel/pixelutils"
-	"image"
 	"time"
 )
 
@@ -11,6 +10,7 @@ func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18).(pixelutils.Pixel)
+	textPixel := pixelutils.NewImageWriter(bigPixel, pixelutils.Green)
 
 	colon := ":"
 	for {
@@ -20,8 +20,9 @@ func main() {
 		} else {
 			colon = ":"
 		}
-		timeStr := fmt.Sprintf("%02d%s%02d", time.Now().Hour(), colon, time.Now().Minute())
-		pixelutils.DrawText(pixelutils.SubPixel(bigPixel, image.Rect(0, 6, 5*4, 12)), pixelutils.Green, timeStr)
+
+		textPixel.Cls()
+		fmt.Fprintf(textPixel, "%02d%s%02d", time.Now().Hour(), colon, time.Now().Minute())
 		c <- pixel
 		time.Sleep(500 * time.Millisecond)
 	}
