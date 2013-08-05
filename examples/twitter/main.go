@@ -10,11 +10,13 @@ import (
 	_ "image/png"
 	"log"
 	"os"
+	"strings"
 )
 
 type TweetSection struct {
 	BackgroundImage string
 	Hashtag         string
+	Tweets          chan *twitter.Tweet
 }
 
 var (
@@ -22,15 +24,18 @@ var (
 		{
 			BackgroundImage: `imgs/windows.png`,
 			Hashtag:         "#Windows",
+			Tweets:          make(chan *twitter.Tweet),
 		},
-		// {
-		// 	BackgroundImage: `imgs/osx.png`,
-		// 	Hashtag:         "#OSX",
-		// },
-		// {
-		// 	BackgroundImage: `imgs/ubuntu.png`,
-		// 	Hashtag:         "#Ubuntu",
-		// },
+		{
+			BackgroundImage: `imgs/osx.png`,
+			Hashtag:         "#OSX",
+			Tweets:          make(chan *twitter.Tweet),
+		},
+		{
+			BackgroundImage: `imgs/ubuntu.png`,
+			Hashtag:         "#Ubuntu",
+			Tweets:          make(chan *twitter.Tweet),
+		},
 	}
 	translucentBlack = color.RGBA{0, 0, 0, 200}
 )
@@ -41,22 +46,39 @@ func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
+	TweetDispatch(cred)
+
 	for i, section := range TweetSections {
 		subPixel := pixelutils.SubImage(pixel, image.Rect(0, i*85, 256, (i+1)*85))
-
 		pixelutils.Resize(subPixel, loadImage(section.BackgroundImage))
 		pixelutils.Fill(subPixel, translucentBlack)
-		tweets, err := twitter.Hashtags(cred, section.Hashtag)
-		if err != nil {
-			log.Printf("Could not start tweet streamer for hashtag \"%s\": %s", section.Hashtag, err)
-			continue
-		}
-		go TweetDrawer(fakeC, subPixel, tweets)
-
+		go TweetDrawer(fakeC, subPixel, section.Tweets)
 	}
+
 	for _ = range fakeC {
 		c <- pixel
 	}
+}
+
+func TweetDispatch(cred *twitter.Credentials) {
+	allHashtags := make([]string, 0, len(TweetSections))
+	for _, section := range TweetSections {
+		allHashtags = append(allHashtags, section.Hashtag)
+	}
+
+	tweets, err := twitter.Hashtags(cred, allHashtags...)
+	if err != nil {
+		log.Fatalf("Could not start Twitter stream: %s", err)
+	}
+	go func() {
+		for tweet := range tweets {
+			for _, section := range TweetSections {
+				if strings.Contains(strings.ToLower(tweet.Text), strings.ToLower(section.Hashtag)) {
+					section.Tweets <- tweet
+				}
+			}
+		}
+	}()
 }
 
 func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.Tweet) {

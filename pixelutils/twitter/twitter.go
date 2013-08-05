@@ -37,7 +37,7 @@ type Credentials struct {
 	AccessSecret   string `json:"access_secret"`
 }
 
-func Hashtags(cred *Credentials, Hashtag string) (<-chan *Tweet, error) {
+func Hashtags(cred *Credentials, Hashtags ...string) (<-chan *Tweet, error) {
 	c := make(chan *Tweet)
 	restclient := twittergo.NewClient(&oauth1a.ClientConfig{
 		ConsumerKey:    cred.ConsumerKey,
@@ -56,7 +56,7 @@ func Hashtags(cred *Credentials, Hashtag string) (<-chan *Tweet, error) {
 		Secret: cred.AccessSecret,
 	}, newChannelConverter(c, restclient))
 
-	err := streamclient.Filter(nil, []string{Hashtag}, nil, nil, false, nil)
+	err := streamclient.Filter(nil, Hashtags, nil, nil, false, nil)
 	if err != nil {
 		close(c)
 	}
