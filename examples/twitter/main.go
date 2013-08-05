@@ -5,8 +5,16 @@ import (
 	"fmt"
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 	"github.com/voxelbrain/pixelpixel/pixelutils/twitter"
+	"image"
+	_ "image/png"
 	"log"
 	"os"
+)
+
+const (
+	windowsImage = `imgs/windows.png`
+	osxImage     = `imgs/osx.png`
+	ubuntuImage  = `imgs/ubuntu.png`
 )
 
 func main() {
@@ -14,10 +22,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not load credentials: %s", err)
 	}
-	log.Printf("%#v", cred)
 
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
+	windowsPixel := pixelutils.SubImage(pixel, image.Rect(0, 0*85, 256, 1*85))
+	osxPixel := pixelutils.SubImage(pixel, image.Rect(0, 1*85, 256, 2*85))
+	ubuntuPixel := pixelutils.SubImage(pixel, image.Rect(0, 2*85, 256, 3*85))
+
+	pixelutils.Resize(windowsPixel, loadImage(windowsImage))
+	pixelutils.Resize(osxPixel, loadImage(osxImage))
+	pixelutils.Resize(ubuntuPixel, loadImage(ubuntuImage))
+
+	c <- pixel
+	select {}
+
 	tweets, err := twitter.Hashtags(cred, "#OSX")
 	if err != nil {
 		log.Fatalf("Could not open Twitter stream: %s", err)
@@ -31,6 +49,19 @@ func main() {
 		c <- pixel
 	}
 
+}
+
+func loadImage(path string) image.Image {
+	f, err := os.Open(path)
+	if err != nil {
+		panic(fmt.Sprintf("Could not open hard-coded source image: %s", err))
+	}
+	defer f.Close()
+	img, _, err := image.Decode(f)
+	if err != nil {
+		panic(fmt.Sprintf("Could not decode hard-coded source image: %s", err))
+	}
+	return img
 }
 
 func loadCredentials() (*twitter.Credentials, error) {
