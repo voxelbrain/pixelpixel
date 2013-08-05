@@ -18,16 +18,16 @@ func main() {
 
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
-	tweets, err := twitter.Hashtags(cred, "#ThingsPeopleDoThatPissMeOff")
+	tweets, err := twitter.Hashtags(cred, "#OSX")
 	if err != nil {
 		log.Fatalf("Could not open Twitter stream: %s", err)
 	}
 	for tweet := range tweets {
-		pixelutils.FillRectangle(pixel, pixel.Bounds(), pixelutils.Black)
+		pixelutils.Fill(pixel, pixelutils.Black)
 		pic := tweet.Author.ProfilePicture
-		pixelutils.Copy(pixel, pic, pic.Bounds(), pixel.Bounds())
+		pixelutils.Resize(pixel, pic)
 		text := fmt.Sprintf("%s (@%s):\n%s", tweet.Author.Name, tweet.Author.ScreenName, tweet.Text)
-		pixelutils.DrawText(pixel, pixel.Bounds(), pixelutils.Red, text)
+		pixelutils.DrawText(pixel, pixelutils.Red, text)
 		c <- pixel
 	}
 

@@ -10,7 +10,7 @@ import (
 func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
-	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18)
+	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18).(pixelutils.Pixel)
 
 	colon := ":"
 	for {
@@ -21,7 +21,7 @@ func main() {
 			colon = ":"
 		}
 		timeStr := fmt.Sprintf("%02d%s%02d", time.Now().Hour(), colon, time.Now().Minute())
-		pixelutils.DrawText(bigPixel, image.Rect(0, 6, 5*4, 12), pixelutils.Green, timeStr)
+		pixelutils.DrawText(pixelutils.SubPixel(bigPixel, image.Rect(0, 6, 5*4, 12)), pixelutils.Green, timeStr)
 		c <- pixel
 		time.Sleep(500 * time.Millisecond)
 	}

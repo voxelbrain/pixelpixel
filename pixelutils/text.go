@@ -6,8 +6,8 @@ import (
 	"image/draw"
 )
 
-func DrawText(img draw.Image, r image.Rectangle, c color.Color, text string) {
-	r = r.Canon()
+func DrawText(img draw.Image, c color.Color, text string) {
+	r := img.Bounds().Canon()
 	colorImg := &image.Uniform{c}
 	charRect := image.Rectangle{
 		Min: r.Min,

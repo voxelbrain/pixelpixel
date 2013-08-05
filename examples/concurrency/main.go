@@ -27,7 +27,7 @@ func main() {
 func Blinker(spixel pixelutils.Pixel, sleep time.Duration, colors ...color.Color) {
 	for {
 		for _, color := range colors {
-			pixelutils.FillRectangle(spixel, spixel.Bounds(), color)
+			pixelutils.Fill(spixel, color)
 			c <- pixel
 			time.Sleep(sleep)
 		}

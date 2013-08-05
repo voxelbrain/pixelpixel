@@ -139,6 +139,8 @@ func (lc *localContainer) compile() error {
 
 	cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
 	cmd.Dir = lc.Root
+	cmd.Stdout = lc.LogBuffer
+	cmd.Stderr = lc.LogBuffer
 	return cmd.Run()
 }
 

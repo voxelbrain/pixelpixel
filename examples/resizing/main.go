@@ -25,14 +25,14 @@ func main() {
 	bigImage := downloadImage()
 
 	start := time.Now()
-	pixelutils.Copy(pixel, bigImage, bigImage.Bounds(), pixel.Bounds())
+	pixelutils.Resize(pixel, bigImage)
 	convDuration := time.Now().Sub(start)
 
 	textArea := pixelutils.SubPixel(pixel, pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8))
-	pixelutils.FillRectangle(textArea, textArea.Bounds(), translucentBlack)
+	pixelutils.Fill(textArea, translucentBlack)
 	textArea = pixelutils.DimensionChanger(textArea, 60, 6).(pixelutils.Pixel)
 	text := fmt.Sprintf("Conv: %s", convDuration)
-	pixelutils.DrawText(textArea, textArea.Bounds(), pixelutils.Red, text)
+	pixelutils.DrawText(textArea, pixelutils.Red, text)
 
 	c <- pixel
 	select {}

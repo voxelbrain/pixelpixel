@@ -6,12 +6,9 @@ import (
 	"image/draw"
 )
 
-func Copy(dst draw.Image, src image.Image, sr, dr image.Rectangle) {
-	subRect := sr.Sub(sr.Min)
-	subImg := image.NewRGBA(sr)
-	draw.Draw(subImg, subRect, src, sr.Min, draw.Over)
-	resizeImg, _ := resample.Resize(image.Point{dr.Dx(), dr.Dy()}, subImg)
-	draw.Draw(dst, dr, resizeImg, image.Point{0, 0}, draw.Over)
+func Resize(dst draw.Image, src image.Image) {
+	resizeImg, _ := resample.Resize(image.Point{dst.Bounds().Dx(), dst.Bounds().Dy()}, src)
+	draw.Draw(dst, dst.Bounds(), resizeImg, src.Bounds().Canon().Min, draw.Over)
 }
 
 func SubPixel(pixel Pixel, r image.Rectangle) Pixel {

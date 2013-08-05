@@ -12,7 +12,7 @@ func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
-	bigPixel := pixelutils.DimensionChanger(pixel, 4, 6)
+	bigPixel := pixelutils.DimensionChanger(pixel, 4, 6).(pixelutils.Pixel)
 	for i := 0; i < 5; i++ {
 		color := pixelutils.Green
 		if i > 3 {
@@ -21,7 +21,7 @@ func main() {
 			color = pixelutils.Red
 		}
 		pixelutils.Empty(bigPixel)
-		pixelutils.DrawText(bigPixel, image.Rect(0, 0, 4, 6), color, fmt.Sprintf("%d", 3-i))
+		pixelutils.DrawText(pixelutils.SubPixel(bigPixel, image.Rect(0, 0, 4, 6)), color, fmt.Sprintf("%d", 3-i))
 		c <- pixel
 		time.Sleep(1 * time.Second)
 	}
