@@ -50,7 +50,7 @@ func main() {
 
 	for i, section := range TweetSections {
 		subPixel := pixelutils.SubImage(pixel, image.Rect(0, i*85, 256, (i+1)*85))
-		pixelutils.Resize(subPixel, loadImage(section.BackgroundImage))
+		pixelutils.StretchCopy(subPixel, loadImage(section.BackgroundImage))
 		pixelutils.Fill(subPixel, translucentBlack)
 		go TweetDrawer(fakeC, subPixel, section.Tweets)
 	}
@@ -83,7 +83,7 @@ func TweetDispatch(cred *twitter.Credentials) {
 
 func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.Tweet) {
 	bg := image.NewNRGBA(pixel.Bounds())
-	pixelutils.Resize(bg, pixel)
+	pixelutils.StretchCopy(bg, pixel)
 	c <- pixel
 	avatarArea := pixelutils.SubImage(pixel, image.Rectangle{
 		Min: pixel.Bounds().Min,
@@ -94,8 +94,8 @@ func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.T
 		Max: pixel.Bounds().Max,
 	}), 2, 2)
 	for tweet := range tweets {
-		pixelutils.Resize(pixel, bg)
-		pixelutils.Resize(avatarArea, tweet.Author.ProfilePicture)
+		pixelutils.StretchCopy(pixel, bg)
+		pixelutils.StretchCopy(avatarArea, tweet.Author.ProfilePicture)
 		pixelutils.DrawText(textArea, pixelutils.White, tweet.Text)
 		c <- pixel
 	}
