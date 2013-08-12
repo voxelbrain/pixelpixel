@@ -13,6 +13,17 @@ type dimensionChanger struct {
 	bounds             image.Rectangle
 }
 
+func PixelSizeChanger(img draw.Image, w, h int) draw.Image {
+	b := img.Bounds().Canon()
+	return &dimensionChanger{
+		Image:    img,
+		paddingX: b.Dx() % w,
+		paddingY: b.Dy() % h,
+		pixel:    image.Rect(0, 0, w, h),
+		bounds:   image.Rect(0, 0, b.Dx()/w, b.Dy()/h),
+	}
+}
+
 func DimensionChanger(img draw.Image, w, h int) draw.Image {
 	b := img.Bounds().Canon()
 	return &dimensionChanger{

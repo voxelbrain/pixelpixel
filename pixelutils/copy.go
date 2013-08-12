@@ -7,9 +7,9 @@ import (
 	"image/draw"
 )
 
-func Resize(dst draw.Image, src image.Image) {
+func StretchCopy(dst draw.Image, src image.Image) {
 	resizeImg, _ := resample.Resize(image.Point{dst.Bounds().Dx(), dst.Bounds().Dy()}, src)
-	draw.Draw(dst, dst.Bounds(), resizeImg, src.Bounds().Canon().Min, draw.Over)
+	draw.Draw(dst, dst.Bounds(), resizeImg, resizeImg.Bounds().Min, draw.Over)
 }
 
 func SubImage(img draw.Image, r image.Rectangle) draw.Image {

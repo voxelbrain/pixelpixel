@@ -25,7 +25,7 @@ func main() {
 	bigImage := downloadImage()
 
 	start := time.Now()
-	pixelutils.Resize(pixel, bigImage)
+	pixelutils.StretchCopy(pixel, bigImage)
 	convDuration := time.Now().Sub(start)
 
 	textArea := pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8)
