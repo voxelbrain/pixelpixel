@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/voxelbrain/pixelpixel/pixelutils"
-	"image"
 	"log"
 	"os"
 
@@ -20,9 +19,23 @@ import (
 	_ "bitbucket.org/zombiezen/goray/textures"
 )
 
+const (
+	sceneFile = `scene.yml`
+)
+
 func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
+
+	sc, integ := buildScene(sceneFile)
+	img := goray.Render(sc, integ, raylog.Default)
+
+	pixelutils.StretchCopy(pixel, img)
+	c <- pixel
+	select {}
+}
+
+func buildScene(file string) (*goray.Scene, goray.Integrator) {
 	sc := goray.NewScene(goray.IntersecterBuilder(intersect.NewKD), raylog.Default)
 
 	f, err := os.Open("scene.yml")
@@ -34,11 +47,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not parse scene: %s", err)
 	}
-	sc.Update()
-	img := goray.Render(sc, integ, raylog.Default)
-
-	pixelutils.StretchCopy(pixel, img)
-	pixelutils.Fill(pixelutils.SubImage(pixel, image.Rect(0, 0, 10, 10)), pixelutils.Green)
-	c <- pixel
-	select {}
+	return sc, integ
 }
