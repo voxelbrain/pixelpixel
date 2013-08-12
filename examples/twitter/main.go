@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 	"github.com/voxelbrain/pixelpixel/pixelutils/twitter"
 	"image"
@@ -82,6 +83,7 @@ func TweetDispatch(cred *twitter.Credentials) {
 }
 
 func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.Tweet) {
+	counter := 0
 	bg := image.NewNRGBA(pixel.Bounds())
 	pixelutils.StretchCopy(bg, pixel)
 	c <- pixel
@@ -94,8 +96,10 @@ func TweetDrawer(c chan<- draw.Image, pixel draw.Image, tweets <-chan *twitter.T
 		Max: pixel.Bounds().Max,
 	}), 2, 2)
 	for tweet := range tweets {
+		counter++
 		pixelutils.StretchCopy(pixel, bg)
 		pixelutils.StretchCopy(avatarArea, tweet.Author.ProfilePicture)
+		pixelutils.DrawText(pixelutils.PixelSizeChanger(avatarArea, 3, 3), pixelutils.Red, fmt.Sprintf("%03d", counter))
 		pixelutils.DrawText(textArea, pixelutils.White, tweet.Text)
 		c <- pixel
 	}
