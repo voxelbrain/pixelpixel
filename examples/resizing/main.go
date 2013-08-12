@@ -29,7 +29,7 @@ func main() {
 	convDuration := time.Now().Sub(start)
 
 	textArea := pixel.Bounds().Intersect(image.Rect(0, 220, 999, 999)).Inset(8)
-	text := pixelutils.NewImageWriter(pixelutils.DimensionChanger(pixelutils.SubPixel(pixel, textArea), 60, 6), pixelutils.Red)
+	text := pixelutils.NewImageWriter(pixelutils.DimensionChanger(pixelutils.SubImage(pixel, textArea), 60, 6), pixelutils.Red)
 
 	pixelutils.Fill(text, translucentBlack)
 	fmt.Fprintf(text, "Conv: %s", convDuration)

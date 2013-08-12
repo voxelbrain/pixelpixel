@@ -1,14 +1,14 @@
 package pixelutils
 
 import (
-	"github.com/Zwobot/go-resample/resample"
+	"github.com/disintegration/imaging"
 	"image"
 	"image/color"
 	"image/draw"
 )
 
 func StretchCopy(dst draw.Image, src image.Image) {
-	resizeImg, _ := resample.Resize(image.Point{dst.Bounds().Dx(), dst.Bounds().Dy()}, src)
+	resizeImg := imaging.Resize(src, dst.Bounds().Dx(), dst.Bounds().Dy(), imaging.Lanczos)
 	draw.Draw(dst, dst.Bounds(), resizeImg, resizeImg.Bounds().Min, draw.Over)
 }
 
