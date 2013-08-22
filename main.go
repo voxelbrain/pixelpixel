@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -59,6 +60,14 @@ func main() {
 	}
 }
 
+type click struct {
+	PixelId  string `json:"key"`
+	Position struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	} `json:"position"`
+}
+
 func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 	f := NewFanout(pa.Messages)
 	return websocket.Handler(func(c *websocket.Conn) {
@@ -66,13 +75,17 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 		defer f.Close(messages)
 
 		go func() {
-			buf := make([]byte, 16)
+			var click click
 			for {
-				_, err := c.Read(buf)
-				if err != nil {
-					f.Close(messages)
+				err := websocket.JSON.Receive(c, &click)
+				if err == io.EOF {
 					return
 				}
+				if err != nil {
+					log.Printf("Received invalid click: %s", err)
+					continue
+				}
+				log.Printf("Click at %#v", click)
 			}
 		}()
 
