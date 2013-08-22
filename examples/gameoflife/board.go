@@ -12,27 +12,27 @@ type GameBoard interface {
 }
 
 type ImageBoard struct {
-	img draw.Image
+	Image       draw.Image
+	Dead, Alive color.Color
 }
 
 func (ib *ImageBoard) Dimensions() (int, int) {
-	return ib.img.Bounds().Dx(), ib.img.Bounds().Dy()
+	return ib.Image.Bounds().Dx(), ib.Image.Bounds().Dy()
 }
 
 func (ib *ImageBoard) Get(x, y int) bool {
-	r, _, _, _ := ib.img.At(x, y).RGBA()
-	if r == 0 {
+	if colorEqual(ib.Image.At(x, y), ib.Alive) {
 		return true
 	}
 	return false
 }
 
 func (ib *ImageBoard) Set(x, y int, alive bool) {
-	c := color.White
+	c := ib.Dead
 	if alive {
-		c = color.Black
+		c = ib.Alive
 	}
-	ib.img.Set(x, y, c)
+	ib.Image.Set(x, y, c)
 }
 
 func NextGen(board GameBoard) {
@@ -75,4 +75,10 @@ func toInt(b bool) int {
 		return 1
 	}
 	return 0
+}
+
+func colorEqual(c1, c2 color.Color) bool {
+	r1, g1, b1, a1 := c1.RGBA()
+	r2, g2, b2, a2 := c2.RGBA()
+	return r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2
 }

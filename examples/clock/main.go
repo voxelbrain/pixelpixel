@@ -9,7 +9,7 @@ import (
 func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
-	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18).(pixelutils.Pixel)
+	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18)
 	textPixel := pixelutils.NewImageWriter(bigPixel, pixelutils.Green)
 
 	colon := ":"

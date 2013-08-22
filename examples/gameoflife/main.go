@@ -19,7 +19,11 @@ func main() {
 	c := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
-	board := &ImageBoard{&DonutImage{pixelutils.DimensionChanger(pixel, Size, Size)}}
+	board := &ImageBoard{
+		Image: &DonutImage{pixelutils.DimensionChanger(pixel, Size, Size)},
+		Alive: pixelutils.Green,
+		Dead:  pixelutils.Black,
+	}
 	initBoard(board)
 	for {
 		c <- pixel
