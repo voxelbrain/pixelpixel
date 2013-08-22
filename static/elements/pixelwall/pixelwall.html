@@ -21,9 +21,14 @@
 					pixel = document.createElement('pixel-pixel')
 					pixel.id = pixelnames[i];
 					pixel.key = pixelnames[i];
-					pixel.addEventListener('click', function(key) {
-						this.fire('pixelClick', {key: key});
-					}.bind(this, pixelnames[i]));
+					pixel.addEventListener('click', function(pixel, ev) {
+						var r = pixel.canvasRect();
+						this.fire('pixelClick', {
+							key: pixel.key,
+							x: Math.floor(ev.x - r.left),
+							y: Math.floor(ev.y - r.top),
+						});
+					}.bind(this, pixel));
 					this.addPixel(pixel);
 				}
 			},

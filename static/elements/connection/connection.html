@@ -1,0 +1,40 @@
+<polymer-element name="pixel-connection" attributes="href">
+	<script>
+		var i = 0;
+		var type_created = i++;
+		var type_change  = i++;
+		var type_failure = i++;
+
+		Polymer('pixel-connection', {
+			ws: null,
+			href: '',
+			hrefChanged: function() {
+				this.ws = new WebSocket(this.href);
+				this.ws.onmessage = this.message.bind(this);
+				this.ws.onclose = function() {
+					alert('WebSocket connection lost');
+				}
+			},
+			message: function(ev) {
+				event = JSON.parse(ev.data);
+				switch(event.type) {
+					case type_created:
+						this.fire('pixelCreate', event.pixel);
+					break;
+					case type_change:
+						this.fire('pixelChange', event.pixel);
+					break;
+					case type_failure:
+						this.fire('pixelCrash', event.pixel);
+					break;
+				}
+			},
+			reportClick: function(key, pos) {
+				this.ws.send(JSON.stringify({
+					key: key,
+					position: pos,
+				}));
+			}
+		});
+	</script>
+</polymer-element>
