@@ -1,12 +1,9 @@
-<script src="js/rainbow.js"></script>
-<script src="js/go.js"></script>
 <polymer-element name="pixel-codeinspector" attributes="key">
 	<template>
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
-		<link href="css/solarized-dark.css" rel="stylesheet" type="text/css" />
 		<polymer-ui-tabs id="files" valueattr="innerText">
 		</polymer-ui-tabs>
-		<pre><code id="code" data-language="go"></code></pre>
+		<pixel-code id="code"></pixel-code>
 
 		<div class="icon" id="close">
 			<div class="cross"></div>
@@ -52,16 +49,13 @@
 				if(file in this.files) {
 					content = this.files[file];
 				}
+				this.$.code.innerText = content;
 				if(/\.go$/.test(file)) {
-					Rainbow.color(content, 'go', function(code) {
-						this.$.code.innerHTML = code;
-					}.bind(this));
-
+					this.$.code.language = "go";
 				} else {
-					this.$.code.innerText = content;
+					this.$.code.language = "plain";
 				}
-
-
+				this.$.code.update();
 			},
 			reloadFiles: function() {
 				$.get('/pixels/'+this.key+'/fs').success(function(data) {

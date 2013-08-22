@@ -1,0 +1,40 @@
+<script src="js/rainbow.js"></script>
+<script src="js/go.js"></script>
+<polymer-element name="pixel-code" attributes="language">
+	<template>
+		<link href="css/solarized-dark.css" rel="stylesheet" type="text/css" />
+
+		<pre><code id="styledcode"></code></pre>
+		<div style="display: none">
+			<content id="plaincode"></content>
+		</div>
+	</template>
+	<script>
+		Polymer('pixel-code', {
+			language: "none",
+			languageChanged: function() {
+				this.update();
+			},
+			getText: function() {
+				var nodes = this.$.plaincode.getDistributedNodes();
+				var text = "";
+				[].forEach.call(nodes, function(node) {
+					text += node.innerText || node.textContent;
+				});
+				return text;
+			},
+			update: function() {
+				switch(this.language) {
+					case "go":
+						Rainbow.color(this.getText(), 'go', function(code) {
+							this.$.styledcode.innerHTML = code;
+						}.bind(this));
+					break;
+					default:
+						this.$.styledcode.innerText = this.getText();
+					break;
+				}
+			},
+		});
+	</script>
+</polymer-element>
