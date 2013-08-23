@@ -236,6 +236,7 @@ func (pa *PixelApi) ReportClick(c *pixelutils.Click) {
 	pixel, ok := pa.pixels[c.PixelId]
 	if !ok {
 		log.Printf("Received unknown Pixel ID %s", c.PixelId)
+		return
 	}
 	pixel.Clicks <- c
 }
