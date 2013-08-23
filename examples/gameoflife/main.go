@@ -16,7 +16,7 @@ func init() {
 }
 
 func main() {
-	c := pixelutils.PixelPusher()
+	wall, _ := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
 	board := &ImageBoard{
@@ -26,7 +26,7 @@ func main() {
 	}
 	initBoard(board)
 	for {
-		c <- pixel
+		wall <- pixel
 		NextGen(board)
 		time.Sleep(300 * time.Millisecond)
 	}

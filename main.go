@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -10,6 +11,8 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/voxelbrain/goptions"
+
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 var (
@@ -66,13 +69,17 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 		defer f.Close(messages)
 
 		go func() {
-			buf := make([]byte, 16)
+			click := &pixelutils.Click{}
 			for {
-				_, err := c.Read(buf)
-				if err != nil {
-					f.Close(messages)
+				err := websocket.JSON.Receive(c, &click)
+				if err == io.EOF {
 					return
 				}
+				if err != nil {
+					log.Printf("Received invalid click: %s", err)
+					continue
+				}
+				pa.ReportClick(click)
 			}
 		}()
 

@@ -13,12 +13,15 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 type Pixel struct {
 	Id string
 	Container
 	Filesystem map[string]string
+	Clicks     chan *pixelutils.Click
 	LastImage  *bytes.Buffer
 }
 
@@ -69,6 +72,7 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 		Container:  ctr,
 		Filesystem: fsObject(tar.NewReader(bytes.NewReader(buf.Bytes()))),
 		LastImage:  &bytes.Buffer{},
+		Clicks:     make(chan *pixelutils.Click),
 	}
 	io.Copy(pixel.LastImage, bytes.NewReader(blackPixel.Bytes()))
 
@@ -148,6 +152,13 @@ func (pa *PixelApi) pixelListener(pixel *Pixel) {
 		}
 	}()
 
+	go func() {
+		enc := json.NewEncoder(c)
+		for click := range pixel.Clicks {
+			enc.Encode(click)
+		}
+	}()
+
 	tr := tar.NewReader(c)
 	for {
 		_, err := tr.Next()
@@ -219,6 +230,14 @@ func (pa *PixelApi) GetPixelContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "image/png")
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", pixel.LastImage.Len()))
 	io.Copy(w, bytes.NewReader(pixel.LastImage.Bytes()))
+}
+
+func (pa *PixelApi) ReportClick(c *pixelutils.Click) {
+	pixel, ok := pa.pixels[c.PixelId]
+	if !ok {
+		log.Printf("Received unknown Pixel ID %s", c.PixelId)
+	}
+	pixel.Clicks <- c
 }
 
 func fsObject(r *tar.Reader) map[string]string {

@@ -44,7 +44,7 @@ var (
 func main() {
 	cred := loadCredentials()
 	fakeC := make(chan draw.Image)
-	c := pixelutils.PixelPusher()
+	wall, _ := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 
 	TweetDispatch(cred)
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	for _ = range fakeC {
-		c <- pixel
+		wall <- pixel
 	}
 }
 

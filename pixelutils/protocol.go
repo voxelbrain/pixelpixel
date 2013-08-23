@@ -3,6 +3,7 @@ package pixelutils
 import (
 	"archive/tar"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/draw"
@@ -13,11 +14,26 @@ import (
 	"os"
 )
 
+type Click struct {
+	PixelId  string `json:"key"`
+	Position struct {
+		X int `json:"x"`
+		Y int `json:"y"`
+	} `json:"position"`
+}
+
+func (c *Click) Point() image.Point {
+	return image.Point{
+		X: c.Position.X,
+		Y: c.Position.Y,
+	}
+}
+
 func NewPixel() draw.Image {
 	return image.NewRGBA(image.Rect(0, 0, 256, 256))
 }
 
-func PixelPusher() chan<- draw.Image {
+func PixelPusher() (chan<- draw.Image, <-chan *Click) {
 	addr := fmt.Sprintf("localhost:%s", os.Getenv("PORT"))
 	log.Printf("Starting pixel on %s", addr)
 	l, err := net.Listen("tcp", addr)
@@ -30,7 +46,7 @@ func PixelPusher() chan<- draw.Image {
 		log.Fatalf("Could not accept connection: %s", err)
 	}
 
-	return commitLoop(c)
+	return commitLoop(c), clickDecoder(c)
 }
 
 func commitLoop(w io.WriteCloser) chan<- draw.Image {
@@ -47,6 +63,28 @@ func commitLoop(w io.WriteCloser) chan<- draw.Image {
 			})
 			io.Copy(tw, buf)
 			tw.Flush()
+		}
+	}()
+	return c
+}
+
+func clickDecoder(r io.ReadCloser) <-chan *Click {
+	c := make(chan *Click, 1)
+	go func() {
+		dec := json.NewDecoder(r)
+		for {
+			click := &Click{}
+			err := dec.Decode(&click)
+			if err != nil {
+				log.Printf("Received invalid click object: %s", err)
+				continue
+			}
+			// Discard click if there's no one to read it.
+			// Don't build up backpressure.
+			select {
+			case c <- click:
+			default:
+			}
 		}
 	}()
 	return c
