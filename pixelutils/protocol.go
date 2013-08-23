@@ -69,7 +69,7 @@ func commitLoop(w io.WriteCloser) chan<- draw.Image {
 }
 
 func clickDecoder(r io.ReadCloser) <-chan *Click {
-	c := make(chan *Click)
+	c := make(chan *Click, 1)
 	go func() {
 		dec := json.NewDecoder(r)
 		for {
