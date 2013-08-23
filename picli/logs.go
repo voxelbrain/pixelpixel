@@ -6,7 +6,7 @@ import (
 )
 
 func logs(key string) {
-	log.Printf("Logs for \"%s\":", key)
+	fmt.Printf("Logs for \"%s\":\n", key)
 	_, body, err := makeApiCall("GET", "/"+key+"/logs", nil)
 	if err != nil {
 		log.Fatalf("Could not reqeust logs: %s", err)

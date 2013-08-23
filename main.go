@@ -50,7 +50,9 @@ func main() {
 		Dir:  options.TemplateDir,
 		Data: TemplateData(),
 	}))
-
+	r.HandleFunc("/handshake", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "PIXELPIXEL OK")
+	})
 	r.PathPrefix("/pixels").Handler(http.StripPrefix("/pixels", pa))
 
 	r.PathPrefix("/").Methods("GET").Handler(http.FileServer(http.Dir(options.StaticDir)))

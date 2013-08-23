@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"path"
@@ -33,6 +34,8 @@ func main() {
 	fs := goptions.NewFlagSet("picli", &options)
 	err := fs.Parse(os.Args[1:])
 	key := prepareKey()
+
+	options.Server = validateServer(options.Server)
 
 	switch options.Verbs {
 	case "upload":
@@ -94,4 +97,27 @@ func slashify(url string) string {
 		url = url + "/"
 	}
 	return "http://" + strings.TrimPrefix(url, "/")
+}
+
+const (
+	DEFAULT_REMOTE_SERVER = "pixelpixel.haxigon.com"
+)
+
+func validateServer(server string) string {
+	resp, err := http.Get("http://" + path.Join(server, "handshake"))
+	if err == nil && readAll(resp.Body) == "PIXELPIXEL OK" {
+		return server
+	}
+
+	resp, err = http.Get("http://" + path.Join(DEFAULT_REMOTE_SERVER, "handshake"))
+	if err == nil && readAll(resp.Body) == "PIXELPIXEL OK" {
+		return DEFAULT_REMOTE_SERVER
+	}
+	log.Fatalf("Could not connect to server")
+	return ""
+}
+
+func readAll(r io.Reader) string {
+	data, _ := ioutil.ReadAll(r)
+	return string(data)
 }
