@@ -42,6 +42,13 @@
 				};
 				conn.reportClick(key, pos);
 			});
+			wall.addEventListener('headerClick', function(ev) {
+				insp.key = ev.detail;
+				insp.className = '';
+			});
+			insp.addEventListener('close', function() {
+				insp.className = 'hidden';
+			})
 			conn.href = 'ws://'+window.location.host+'/ws';
 		});
 	</script>
