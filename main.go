@@ -11,6 +11,8 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/voxelbrain/goptions"
+
+	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
 
 var (
@@ -60,14 +62,6 @@ func main() {
 	}
 }
 
-type click struct {
-	PixelId  string `json:"key"`
-	Position struct {
-		X int `json:"x"`
-		Y int `json:"y"`
-	} `json:"position"`
-}
-
 func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 	f := NewFanout(pa.Messages)
 	return websocket.Handler(func(c *websocket.Conn) {
@@ -75,7 +69,7 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 		defer f.Close(messages)
 
 		go func() {
-			var click click
+			click := &pixelutils.Click{}
 			for {
 				err := websocket.JSON.Receive(c, &click)
 				if err == io.EOF {
@@ -85,7 +79,7 @@ func NewStreamingHandler(pa *PixelApi) websocket.Handler {
 					log.Printf("Received invalid click: %s", err)
 					continue
 				}
-				log.Printf("Click at %#v", click)
+				pa.ReportClick(click)
 			}
 		}()
 
