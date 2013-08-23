@@ -22,6 +22,13 @@ type Click struct {
 	} `json:"position"`
 }
 
+func (c *Click) Point() image.Point {
+	return image.Point{
+		X: c.Position.X,
+		Y: c.Position.Y,
+	}
+}
+
 func NewPixel() draw.Image {
 	return image.NewRGBA(image.Rect(0, 0, 256, 256))
 }
@@ -62,7 +69,7 @@ func commitLoop(w io.WriteCloser) chan<- draw.Image {
 }
 
 func clickDecoder(r io.ReadCloser) <-chan *Click {
-	c := make(chan *Click, 1)
+	c := make(chan *Click)
 	go func() {
 		dec := json.NewDecoder(r)
 		for {
@@ -72,8 +79,8 @@ func clickDecoder(r io.ReadCloser) <-chan *Click {
 				log.Printf("Received invalid click object: %s", err)
 				continue
 			}
-			// Discard click if an old one hasn't been taken out of
-			// the channel. Don't build up backpressure.
+			// Discard click if there's no one to read it.
+			// Don't build up backpressure.
 			select {
 			case c <- click:
 			default:
