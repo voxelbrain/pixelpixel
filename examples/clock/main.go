@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	c := pixelutils.PixelPusher()
+	wall, _ := pixelutils.PixelPusher()
 	pixel := pixelutils.NewPixel()
 	bigPixel := pixelutils.DimensionChanger(pixel, 5*4, 18)
 	textPixel := pixelutils.NewImageWriter(bigPixel, pixelutils.Green)
@@ -23,7 +23,7 @@ func main() {
 
 		textPixel.Cls()
 		fmt.Fprintf(textPixel, "%02d%s%02d", time.Now().Hour(), colon, time.Now().Minute())
-		c <- pixel
+		wall <- pixel
 		time.Sleep(500 * time.Millisecond)
 	}
 }
