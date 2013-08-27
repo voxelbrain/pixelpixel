@@ -6,9 +6,10 @@ Feedback is greatly appreciated.
 `pixelpixel` provides an array of small (256px x 256px) canvases
 (each called a *pixel*) to every user. Each user can write go code
 and upload it to the server using the `picli` tool to manipulate his/her
-canvas over time.
+canvas.
 
-Users can inspect the code of other user’s pixels by clicking on them.
+Users can inspect the code of other user’s pixels by clicking on the
+3-character identifier visible on the pixelpixel.
 
 ## Server
 The server provides the *pixelpixel*, the canvas on which all the
@@ -33,7 +34,7 @@ To install it, run
 
 To get started, you can upload one of the [examples] to the server
 
-	$ cd examples/rainbow
+	$ cd examples/pixelpixelpixel
 	$ picli upload
 	2013/07/19 21:35:03 Adding main.go
 	2013/07/19 21:35:03 Creating a new pixel
