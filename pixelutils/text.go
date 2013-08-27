@@ -8,6 +8,8 @@ import (
 	"io"
 )
 
+// ImageWriter is a writable image. The image behaves like a
+// non-scrolling terminal.
 type ImageWriter interface {
 	draw.Image
 	io.Writer
@@ -21,6 +23,8 @@ type imageWriter struct {
 	color    color.Color
 }
 
+// NewImageWriter creates a new ImageWriter, which writes on the
+// given image in the given color.
 func NewImageWriter(img draw.Image, c color.Color) ImageWriter {
 	iw := &imageWriter{
 		Image: img,
@@ -59,6 +63,7 @@ func (iw *imageWriter) Cls() {
 	}
 }
 
+// DrawText is a convenience function to write text into an image.
 func DrawText(img draw.Image, c color.Color, text string) {
 	io.WriteString(NewImageWriter(img, c), text)
 }
@@ -69,6 +74,8 @@ func nextLine(r *image.Rectangle, xstart int) {
 	r.Max = r.Min.Add(image.Point{4, 6})
 }
 
+// MaskForCharacter returns an 4x6 black-and-white image mask for
+// the given character. Useful for image/draw.DrawMask().
 func MaskForCharacter(c byte) image.Image {
 	mask := image.NewAlpha(image.Rect(0, 0, 4, 6))
 	rows := font[int(c)]

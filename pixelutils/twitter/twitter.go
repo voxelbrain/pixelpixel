@@ -1,3 +1,16 @@
+// Package twitter provides a radically simplified Twitter API.
+//
+// To use this package, you must create your own Twitter app.
+//
+// Instructions:
+//     * Goto http://dev.twitter.com
+//     * Sign in
+//     * Click on your profile icon and goto “My applications”
+//     * Click “Create a new application”
+//     * Fill out the form (don’t mind the callback URL)
+//     * After creating your app, click on “Create my access token”
+//
+// Now you have all the values needed to fill the `Credentials` struct.
 package twitter
 
 import (
@@ -37,6 +50,8 @@ type Credentials struct {
 	AccessSecret   string `json:"access_secret"`
 }
 
+// Hashtags returns a channel over which tweets can be received, which match
+// at least one of the given hashtags.
 func Hashtags(cred *Credentials, Hashtags ...string) (<-chan *Tweet, error) {
 	c := make(chan *Tweet)
 	restclient := twittergo.NewClient(&oauth1a.ClientConfig{

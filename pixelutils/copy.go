@@ -7,11 +7,16 @@ import (
 	"image/draw"
 )
 
+// StretchCopy transforms src to fill dst and draws the result over
+// dst.
 func StretchCopy(dst draw.Image, src image.Image) {
 	resizeImg := imaging.Resize(src, dst.Bounds().Dx(), dst.Bounds().Dy(), imaging.Lanczos)
 	draw.Draw(dst, dst.Bounds(), resizeImg, resizeImg.Bounds().Min, draw.Over)
 }
 
+// SubImage extracts a rectangular subset of img as a separate image.
+// If present, the `SubImage()` method will be used. Otherwise, the
+// behaviour will be emulated.
 func SubImage(img draw.Image, r image.Rectangle) draw.Image {
 	if di, ok := img.(subimager); ok {
 		si := di.SubImage(r)

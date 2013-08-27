@@ -14,6 +14,7 @@ import (
 	"os"
 )
 
+// Click represents a click event on a pixel.
 type Click struct {
 	PixelId  string `json:"key"`
 	Position struct {
@@ -29,10 +30,15 @@ func (c *Click) Point() image.Point {
 	}
 }
 
+// NewPixel creates a new empty pixel.
 func NewPixel() draw.Image {
-	return image.NewRGBA(image.Rect(0, 0, 256, 256))
+	img := image.NewRGBA(image.Rect(0, 0, 256, 256))
+	Empty(img)
+	return img
 }
 
+// PixelPusher returns 2 channels. One, over which a pixel can be pushed
+// onto the wall, and another, over which click events can be received.
 func PixelPusher() (chan<- draw.Image, <-chan *Click) {
 	addr := fmt.Sprintf("localhost:%s", os.Getenv("PORT"))
 	log.Printf("Starting pixel on %s", addr)
