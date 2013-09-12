@@ -32,11 +32,12 @@ func main() {
 			time.Sleep(200 * time.Millisecond)
 		}
 		for click := range clicks {
-			if click.Point().In(subPixel.Bounds()) {
+			switch {
+			case click.Point().In(subPixel.Bounds()):
 				offset[1] = (offset[1] + 1) % len(colors)
-			} else if click.Point().In(square.Bounds()) {
+			case click.Point().In(square.Bounds()):
 				offset[2] = (offset[2] + 1) % len(colors)
-			} else {
+			default:
 				offset[0] = (offset[0] + 1) % len(colors)
 			}
 			drawSignal <- true

@@ -155,7 +155,10 @@ func (pa *PixelApi) pixelListener(pixel *Pixel) {
 	go func() {
 		enc := json.NewEncoder(c)
 		for click := range pixel.Clicks {
-			enc.Encode(click)
+			err := enc.Encode(click)
+			if err != nil {
+				return
+			}
 		}
 	}()
 
