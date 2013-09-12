@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/voxelbrain/goptions"
 )
@@ -21,6 +22,7 @@ var (
 		goptions.Verbs
 		Upload struct{} `goptions:"upload"`
 		Logs   struct{} `goptions:"logs"`
+		Format struct{} `goptions:"format"`
 	}{
 		Server: "localhost:8080",
 	}
@@ -35,13 +37,15 @@ func main() {
 	err := fs.Parse(os.Args[1:])
 	key := prepareKey()
 
-	options.Server = validateServer(options.Server)
-
 	switch options.Verbs {
 	case "upload":
+		options.Server = validateServer(options.Server)
 		upload(key)
 	case "logs":
+		options.Server = validateServer(options.Server)
 		logs(key)
+	case "format":
+		format()
 	default:
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
@@ -49,7 +53,6 @@ func main() {
 		fs.PrintHelp(os.Stderr)
 		return
 	}
-
 }
 
 func makeApiCall(method, subpath string, body io.Reader) (int, string, error) {
@@ -104,6 +107,13 @@ const (
 )
 
 func validateServer(server string) string {
+	t := time.AfterFunc(3*time.Second, func() {
+		log.Fatalf("Attempt to connect to server timed out")
+	})
+	defer func() {
+		t.Stop()
+	}()
+
 	resp, err := http.Get("http://" + path.Join(server, "handshake"))
 	if err == nil && readAll(resp.Body) == "PIXELPIXEL OK" {
 		return server
