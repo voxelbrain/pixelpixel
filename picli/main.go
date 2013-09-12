@@ -40,6 +40,7 @@ func main() {
 	switch options.Verbs {
 	case "upload":
 		options.Server = validateServer(options.Server)
+		format()
 		upload(key)
 	case "logs":
 		options.Server = validateServer(options.Server)
