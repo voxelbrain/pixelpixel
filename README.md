@@ -32,6 +32,12 @@ To install it, run
 
 	$ go get github.com/voxelbrain/pixelpixel/picli
 
+or download one of the precompiled binaries
+
+* [Mac OS X](http://filedump.surmair.de/binaries/picli/darwin_amd64/picli)
+* [Windows](http://filedump.surmair.de/binaries/picli/windows_386/picli)
+* [Linux](http://filedump.surmair.de/binaries/picli/linux_386/picli)
+
 To get started, you can upload one of the [examples] to the server
 
 	$ cd examples/pixelpixelpixel
