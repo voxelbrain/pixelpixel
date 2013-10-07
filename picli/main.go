@@ -35,15 +35,14 @@ const (
 func main() {
 	fs := goptions.NewFlagSet("picli", &options)
 	err := fs.Parse(os.Args[1:])
+	options.Server = validateServer(options.Server)
 	key := prepareKey()
 
 	switch options.Verbs {
 	case "upload":
-		options.Server = validateServer(options.Server)
 		format()
 		upload(key)
 	case "logs":
-		options.Server = validateServer(options.Server)
 		logs(key)
 	case "format":
 		format()
