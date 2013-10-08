@@ -46,6 +46,10 @@ To get started, you can upload one of the [examples] to the server
 	2013/07/19 21:35:03 Creating a new pixel
 	2013/07/19 21:35:03 Pixel "j34" uploaded
 
+`picli` tries to push the code to `pixelpixel.haxigon.com` and
+`localhost:8080` in that order. If you need different behaviour, please
+take a look at `picli -h`.
+
 [Go]: http://golang.org
 [examples]: https://github.com/voxelbrain/pixelpixel/tree/develop/examples
 
