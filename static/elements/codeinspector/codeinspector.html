@@ -1,0 +1,91 @@
+<polymer-element name="pixel-codeinspector" attributes="key">
+	<template>
+		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
+		<polymer-ui-tabs id="files" valueattr="innerText">
+		</polymer-ui-tabs>
+		<pixel-code id="code"></pixel-code>
+
+		<div class="icon" id="close">
+			<div class="cross"></div>
+		</div>
+		<div class="icon" id="reload">
+			<div class="reload"></div>
+		</div>
+	</template>
+	<script>
+		function removeAllChildren(node) {
+			while (node.hasChildNodes()) {
+			    node.removeChild(node.lastChild);
+			}
+		}
+
+		function newTabNode(title) {
+			var node = document.createElement('span');
+			node.innerText = title;
+			return node;
+		}
+
+		Polymer('pixel-codeinspector', {
+			key: '',
+			files: {},
+			empty: function() {
+				this.files = {};
+				removeAllChildren(this.$.files);
+				this.$.code.innerText = '';
+			},
+			updateTabs: function() {
+				this.$.files.appendChild(newTabNode('Logs'));
+				for(var file in this.files) {
+					if(file == 'Logs') {
+						continue;
+					}
+					this.$.files.appendChild(newTabNode(file));
+				}
+				this.$.files.selected = '';
+			},
+			updateContent: function() {
+				var file = this.$.files.selected;
+				var content = '';
+				if(file in this.files) {
+					content = this.files[file];
+				}
+				this.$.code.innerText = content;
+				if(/\.go$/.test(file)) {
+					this.$.code.language = "go";
+				} else {
+					this.$.code.language = "plain";
+				}
+				this.$.code.update();
+			},
+			reloadFiles: function() {
+				$.get('/pixels/'+this.key+'/fs').success(function(data) {
+					this.files = data;
+					$.get('/pixels/'+this.key+'/logs').success(function(data) {
+						this.files['Logs'] = data;
+						this.updateTabs();
+					}.bind(this));
+				}.bind(this));
+			},
+			reload: function() {
+				this.empty();
+				this.reloadFiles();
+			},
+			keyChanged: function() {
+				this.reload();
+			},
+			ready: function() {
+				var oldFn = this.$.files.selectedChanged.bind(this.$.files);
+				this.$.files.selectedChanged = function() {
+					oldFn();
+					this.updateContent();
+				}.bind(this);
+				this.$.close.addEventListener('click', function() {
+					this.fire('close');
+				}.bind(this))
+				this.$.reload.addEventListener('click', function() {
+					this.reload();
+				}.bind(this))
+			},
+		});
+	</script>
+</polymer-element>

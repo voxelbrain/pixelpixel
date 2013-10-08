@@ -1,0 +1,37 @@
+<script src="js/zlib.js"></script>
+<script src="js/png.js"></script>
+<polymer-element name="pixel-pixel" attributes="key">
+	<template>
+		<link href="css/pixel.css" rel="stylesheet" type="text/css" />
+		<div>
+			<header id="header">{{key}}</header>
+			<canvas id="canvas"></canvas>
+			<footer></footer>
+		</div>
+	</template>
+	<script>
+		Polymer('pixel-pixel', {
+			key: '',
+			update: function() {
+				PNG.load('/pixels/'+this.key+'/content', this.$.canvas);
+			},
+			ready: function() {
+				this.update();
+				this.$.canvas.addEventListener('click', function(ev) {
+					var r = this.$.canvas.getBoundingClientRect();
+					this.fire('pixelClick', {
+						key: this.key,
+						x: ev.x - r.left,
+						y: ev.y - r.top,
+					});
+				}.bind(this));
+				this.$.header.addEventListener('click', function(ev) {
+					this.fire('headerClick', this.key)
+				}.bind(this));
+			},
+			keyChanged: function() {
+				this.update();
+			},
+		});
+	</script>
+</polymer-element>

@@ -1,0 +1,56 @@
+<!doctype html>
+<head>
+	<link href="/templates/styles.css" rel="stylesheet" type="text/css" />
+	<link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
+
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="/js/polymer.min.js"></script>
+
+    <link rel="import" href="/elements/pixel/pixel.html">
+    <link rel="import" href="/elements/connection/connection.html">
+    <link rel="import" href="/elements/pixelwall/pixelwall.html">
+    <link rel="import" href="/elements/code/code.html">
+    <link rel="import" href="/elements/codeinspector/codeinspector.html">
+    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-tabs/polymer-ui-tabs.html">
+    <link rel="import" href="/elements/polymer-elements/polymer-selector/polymer-selector.html">
+    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-splitter/polymer-ui-splitter.html">
+</head>
+<body>
+	<pixel-connection id="connection"></pixel-connection>
+	<pixel-codeinspector id="inspector" class="hidden"></pixel-codeinspector>
+	<pixel-pixelwall id="wall"></pixel-pixelwall>
+	<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a></footer>
+	<script>
+		window.addEventListener('WebComponentsReady', function() {
+			var conn = document.getElementById('connection');
+			var wall = document.getElementById('wall');
+			var insp = document.getElementById('inspector');
+
+			conn.addEventListener('pixelCreate', function(ev) {
+				wall.pixels += ' ' + ev.detail;
+			});
+			conn.addEventListener('pixelChange', function(ev) {
+				wall.update(ev.detail)
+			});
+			conn.addEventListener('pixelCrash', function(ev) {
+				wall.markCrashed(ev.detail)
+			});
+			wall.addEventListener('pixelClick', function(ev) {
+				var key = ev.detail.key;
+				var pos = {
+					x: ev.detail.x,
+					y: ev.detail.y,
+				};
+				conn.reportClick(key, pos);
+			});
+			wall.addEventListener('headerClick', function(ev) {
+				insp.key = ev.detail;
+				insp.className = '';
+			});
+			insp.addEventListener('close', function() {
+				insp.className = 'hidden';
+			})
+			conn.href = 'ws://'+window.location.host+'/ws';
+		});
+	</script>
+</body>
