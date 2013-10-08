@@ -2,6 +2,13 @@
 <script src="js/go.js"></script>
 <polymer-element name="pixel-code" attributes="language">
 	<template>
+		<style>
+			@host {
+				* {
+					display: block;
+				}
+			}
+		</style>
 		<link href="css/solarized-dark.css" rel="stylesheet" type="text/css" />
 
 		<pre><code id="styledcode"></code></pre>
