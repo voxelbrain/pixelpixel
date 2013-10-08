@@ -48,3 +48,6 @@ To get started, you can upload one of the [examples] to the server
 
 [Go]: http://golang.org
 [examples]: https://github.com/voxelbrain/pixelpixel/tree/develop/examples
+
+---
+Version 1.0-rc1
