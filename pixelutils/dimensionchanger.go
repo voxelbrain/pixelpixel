@@ -15,8 +15,8 @@ type dimensionChanger struct {
 
 // PixelSizeChanger enlarges pixels to the given size, effectively
 // making the image smaller. If either of the pixel dimensions is not
-// a multiple of the respective image dimension, a unused padding to
-// the right and bottom will be inserted.
+// a multiple of the respective image dimension, a padding of unusable
+// pixels will remain to the right and bottom.
 func PixelSizeChanger(img draw.Image, w, h int) draw.Image {
 	b := img.Bounds().Canon()
 	return &dimensionChanger{
