@@ -51,7 +51,7 @@ To get started, you can upload one of the [examples] to the server
 take a look at `picli -h`.
 
 [Go]: http://golang.org
-[examples]: https://github.com/voxelbrain/pixelpixel/tree/develop/examples
+[examples]: https://github.com/voxelbrain/pixelpixel/tree/master/examples
 
 ---
 Version 1.0-rc1
