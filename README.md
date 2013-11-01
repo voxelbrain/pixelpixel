@@ -54,4 +54,4 @@ take a look at `picli -h`.
 [examples]: https://github.com/voxelbrain/pixelpixel/tree/develop/examples
 
 ---
-Version 1.0-rc1
+Version 1.0.0-rc2
