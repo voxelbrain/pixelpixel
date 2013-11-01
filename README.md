@@ -20,7 +20,7 @@ To install the server, run
 
 	$ go get github.com/voxelbrain/pixelpixel
 
-and start the server with
+and start the server from the root of the repository with
 
 	$ pixelpixel
 	2013/07/19 21:27:18 Starting webserver on localhost:8080...
@@ -35,7 +35,7 @@ To install it, run
 or download one of the precompiled binaries
 
 * [Mac OS X](http://filedump.surmair.de/binaries/picli/darwin_amd64/picli)
-* [Windows](http://filedump.surmair.de/binaries/picli/windows_386/picli)
+* [Windows](http://filedump.surmair.de/binaries/picli/windows_386/picli.exe)
 * [Linux](http://filedump.surmair.de/binaries/picli/linux_386/picli)
 
 To get started, you can upload one of the [examples] to the server
@@ -54,4 +54,4 @@ take a look at `picli -h`.
 [examples]: https://github.com/voxelbrain/pixelpixel/tree/develop/examples
 
 ---
-Version 1.0-rc1
+Version 1.0.0-rc2
