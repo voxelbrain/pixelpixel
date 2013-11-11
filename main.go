@@ -53,7 +53,7 @@ func main() {
 				Data: TemplateData(),
 			},
 		},
-		"/pixels/.*": httptools.L{
+		"/pixels(/.*)?": httptools.L{
 			httptools.DiscardPathElements(1),
 			pa,
 		},
