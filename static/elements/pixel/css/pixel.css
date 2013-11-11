@@ -2,6 +2,13 @@ div {
 	display: inline-block;
 }
 
+canvas {
+	position: relative;
+}
+canvas.crashed {
+	opacity: 0.5;
+}
+
 header {
 	text-align: right;
 	margin: 4px 0;
