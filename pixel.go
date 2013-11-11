@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net"
@@ -13,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/surma/httptools"
 
 	"github.com/voxelbrain/pixelpixel/pixelutils"
 )
@@ -40,13 +41,22 @@ func NewPixelApi(cc ContainerCreator) *PixelApi {
 		pixels:   make(map[string]*Pixel),
 		cc:       cc,
 	}
-	h := mux.NewRouter()
-	h.PathPrefix("/").Methods("POST").HandlerFunc(pa.CreatePixel)
-	h.PathPrefix("/{id}/content").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelContent))
-	h.PathPrefix("/{id}/logs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelLogs))
-	h.PathPrefix("/{id}/fs").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.GetPixelFs))
-	h.PathPrefix("/{id}/").Methods("GET").HandlerFunc(pa.ValidatePixelId(pa.Success))
-	h.PathPrefix("/{id}/").Methods("PUT").HandlerFunc(pa.ValidatePixelId(pa.UpdatePixel))
+	h := httptools.NewRegexpSwitch(map[string]http.Handler{
+		"/": httptools.MethodSwitch{"POST": http.HandlerFunc(pa.CreatePixel)},
+		"/([a-z0-9]+)/.+": httptools.L{
+			httptools.DiscardPathElements(1),
+			http.HandlerFunc(pa.ValidatePixelId),
+			httptools.NewRegexpSwitch(map[string]http.Handler{
+				"/content": httptools.MethodSwitch{"GET": http.HandlerFunc(pa.GetPixelContent)},
+				"/logs":    httptools.MethodSwitch{"GET": http.HandlerFunc(pa.GetPixelLogs)},
+				"/fs":      httptools.MethodSwitch{"GET": http.HandlerFunc(pa.GetPixelFs)},
+				"/": httptools.MethodSwitch{
+					"GET": http.HandlerFunc(pa.Success),
+					"PUT": http.HandlerFunc(pa.UpdatePixel),
+				},
+			}),
+		},
+	})
 	pa.Handler = h
 	return pa
 }
@@ -92,11 +102,7 @@ func (pa *PixelApi) CreatePixel(w http.ResponseWriter, r *http.Request) {
 
 func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	id := mux.Vars(r)["id"]
-
-	pa.RLock()
-	pixel := pa.pixels[id]
-	pa.RUnlock()
+	pixel := w.(httptools.VarsResponseWriter).Vars()["pixel"].(*Pixel)
 
 	buf := &bytes.Buffer{}
 	io.Copy(buf, r.Body)
@@ -118,13 +124,13 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	io.Copy(pixel.LastImage, bytes.NewReader(blackPixel.Bytes()))
 
 	pa.Messages <- &Message{
-		Pixel: id,
+		Pixel: pixel.Id,
 		Type:  TypeChange,
 	}
 
 	go pa.pixelListener(pixel)
 
-	http.Error(w, id, http.StatusCreated)
+	http.Error(w, pixel.Id, http.StatusCreated)
 }
 
 func (pa *PixelApi) pixelListener(pixel *Pixel) {
@@ -183,24 +189,22 @@ func (pa *PixelApi) pixelListener(pixel *Pixel) {
 	}
 }
 
-func (pa *PixelApi) ValidatePixelId(h http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, ok := vars["id"]
-		if !ok {
-			http.Error(w, "Pixel ID missing", http.StatusBadRequest)
-			return
-		}
+func (pa *PixelApi) ValidatePixelId(w http.ResponseWriter, r *http.Request) {
+	vars := w.(httptools.VarsResponseWriter).Vars()
+	id, ok := vars["1"].(string)
+	if !ok {
+		http.Error(w, "Pixel ID missing", http.StatusBadRequest)
+		return
+	}
 
-		pa.RLock()
-		_, ok = pa.pixels[id]
-		pa.RUnlock()
-		if !ok {
-			http.Error(w, "No such pixel", http.StatusBadRequest)
-			return
-		}
-		h.ServeHTTP(w, r)
-	})
+	pa.RLock()
+	pixel, ok := pa.pixels[id]
+	pa.RUnlock()
+	if !ok {
+		http.Error(w, "No such pixel", http.StatusBadRequest)
+		return
+	}
+	vars["pixel"] = pixel
 }
 
 func (pa *PixelApi) Success(w http.ResponseWriter, r *http.Request) {
@@ -208,26 +212,20 @@ func (pa *PixelApi) Success(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pa *PixelApi) GetPixelLogs(w http.ResponseWriter, r *http.Request) {
-	pa.RLock()
-	pixel := pa.pixels[mux.Vars(r)["id"]]
-	pa.RUnlock()
+	pixel := w.(httptools.VarsResponseWriter).Vars()["pixel"].(*Pixel)
 
 	io.WriteString(w, pixel.Logs())
 }
 
 func (pa *PixelApi) GetPixelFs(w http.ResponseWriter, r *http.Request) {
-	pa.RLock()
-	pixel := pa.pixels[mux.Vars(r)["id"]]
-	pa.RUnlock()
+	pixel := w.(httptools.VarsResponseWriter).Vars()["pixel"].(*Pixel)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(pixel.Filesystem)
 }
 
 func (pa *PixelApi) GetPixelContent(w http.ResponseWriter, r *http.Request) {
-	pa.RLock()
-	pixel := pa.pixels[mux.Vars(r)["id"]]
-	pa.RUnlock()
+	pixel := w.(httptools.VarsResponseWriter).Vars()["pixel"].(*Pixel)
 
 	w.Header().Set("cache-control", "private, max-age=0, no-cache")
 	w.Header().Set("Content-Type", "image/png")
