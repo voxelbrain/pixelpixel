@@ -3,7 +3,9 @@
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
 		<polymer-ui-tabs id="files" valueattr="innerText">
 		</polymer-ui-tabs>
-		<pixel-code id="code"></pixel-code>
+		<!-- FIXME: The inner code block is a temporary fix for the
+		behaviour of the ShadwDOM polyfill -->
+		<pixel-code id="code"><code></code></pixel-code>
 
 		<div class="icon" id="close">
 			<div class="cross"></div>
@@ -31,7 +33,7 @@
 			empty: function() {
 				this.files = {};
 				removeAllChildren(this.$.files);
-				this.$.code.innerText = '';
+				this.$.code.querySelector('code').innerText = '';
 			},
 			updateTabs: function() {
 				this.$.files.appendChild(newTabNode('Logs'));
@@ -49,7 +51,7 @@
 				if(file in this.files) {
 					content = this.files[file];
 				}
-				this.$.code.innerText = content;
+				this.$.code.querySelector('code').innerText = content;
 				if(/\.go$/.test(file)) {
 					this.$.code.language = 'go';
 				} else {
