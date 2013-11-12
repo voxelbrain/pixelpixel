@@ -27,21 +27,50 @@ license that can be found in the LICENSE file.
 -->
 <link rel="import" href="../../polymer-elements/polymer-collapse/polymer-collapse.html">
 
-<polymer-element name="polymer-ui-collapsible" attributes="active">
+<polymer-element name="polymer-ui-collapsible" attributes="active notap">
   <template>
     <link rel="stylesheet" href="polymer-ui-collapsible.css">
-    <div on-tap="toggle">
+    <div on-tap="{{headerTap}}">
       <content select=".polymer-ui-collapsible-header"></content>
     </div>
-    <div id="collapsibleBody">
+    <div id="collapsibleBody" on-tap="{{bodyTap}}">
       <content></content>
     </div>
     <polymer-collapse targetId="collapsibleBody" closed="{{!active}}"></polymer-collapse>
   </template>
   <script>
     Polymer('polymer-ui-collapsible', {
+      /**
+       * If true, tapping on the header will not toggle the active state.
+       *
+       * @attribute notap
+       * @type boolean
+       * @default false
+       */
+      notap: false,
+      /**
+       * If true, the body is expanded.
+       *
+       * @attribute active
+       * @type boolean
+       * @default false
+       */
+      active: false,
+      /** 
+       * Toggle the active state of the collapsible.
+       *
+       * @method toggle
+       */
       toggle: function() {
         this.active = !this.active;
+      },
+      headerTap: function() {
+        if (!this.notap) {
+          this.toggle();
+        }
+      },
+      bodyTap: function(e) {
+        e.notap = true;
       }
     });
   </script>

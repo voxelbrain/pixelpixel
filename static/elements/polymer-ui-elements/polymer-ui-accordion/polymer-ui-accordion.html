@@ -31,6 +31,7 @@ license that can be found in the LICENSE file.
  *     </polymer-ui-accordion>
  *
  * @class polymer-ui-accordion
+ * @extends polymer-selector
  */
 -->
 <link rel="import" href="../../polymer-elements/polymer-selector/polymer-selector.html">
@@ -41,4 +42,13 @@ license that can be found in the LICENSE file.
     <link rel="stylesheet" href="polymer-ui-accordion.css">
     <shadow></shadow>
   </template>
+  <script>
+    Polymer('polymer-ui-accordion', {
+      activateHandler: function(e) {
+        if (!e.notap) {
+          this.super(arguments);
+        }
+      }
+    })
+  </script>
 </polymer-element>

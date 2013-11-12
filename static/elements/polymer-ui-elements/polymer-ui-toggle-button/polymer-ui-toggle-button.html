@@ -13,19 +13,20 @@ license that can be found in the LICENSE file.
  *
  * Example:
  *
- *     <polymer-ui-toggle-button value="true"></polymer-ui-toggle-button>
+ *     <polymer-ui-toggle-button></polymer-ui-toggle-button>
  *
  * @class polymer-ui-toggle-button
  */
 -->
-<polymer-element name="polymer-ui-toggle-button" attributes="value"
-    on-tap="toggle" on-trackstart="trackStart" on-track="track" on-trackend="trackEnd" on-flick="flick">
+<polymer-element name="polymer-ui-toggle-button" attributes="value noCaption onCaption offCaption"
+    on-tap="{{toggle}}" on-trackstart="{{trackStart}}" on-track="{{track}}" on-trackend="{{trackEnd}}" on-flick="{{flick}}">
   <template>
     <link rel="stylesheet" href="polymer-ui-toggle-button.css" />
+    <link rel="stylesheet" href="../../polymer-elements/polymer-flex-layout/polymer-flex-layout.css" />
     <div id="toggle" class="toggle">
-      <span class="on-label">ON</span>
+      <span class="on-label flexbox align-center justify-center">{{noCaption ? '' : onCaption}}</span>
       <span id="thumb" class="thumb"></span>
-      <span class="off-label">OFF</span>
+      <span class="off-label flexbox align-center justify-center">{{noCaption ? '' : offCaption}}</span>
     </div>
   </template>
   <script>
@@ -38,9 +39,30 @@ license that can be found in the LICENSE file.
        * @default false
        */
       value: false,
-      ready: function() {
-        this.setAttribute('touch-action', 'none');
-      },
+      /**
+       * If true, don't display caption.
+       *
+       * @attribute noCaption
+       * @type boolean
+       * @default false
+       */
+      noCaption: false,
+      /**
+       * Caption for on state.
+       *
+       * @attribute onCaption
+       * @type string
+       * @default 'ON'
+       */
+      onCaption: 'ON',
+      /**
+       * Caption for off state.
+       *
+       * @attribute offCaption
+       * @type string
+       * @default 'OFF'
+       */
+      offCaption: 'OFF',
       toggle: function() {
         this.value = !this.value;
       },
