@@ -2,7 +2,6 @@
 	<template>
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
 		<polymer-ui-tabs id="files" valueattr="innerText">
-			<span>hai</span>
 		</polymer-ui-tabs>
 		<pixel-code id="code"></pixel-code>
 
@@ -37,13 +36,11 @@
 			updateTabs: function() {
 				this.$.files.appendChild(newTabNode('Logs'));
 				_(this.files).each(function(_, filename) {
-					console.log(filename);
 					if(filename == 'Logs') {
 						return;
 					}
 					this.$.files.appendChild(newTabNode(filename));
 				}.bind(this));
-				console.log(this.$.files);
 				this.$.files.selected = 'Logs';
 			},
 			updateContent: function() {
@@ -72,11 +69,11 @@
 						method: 'GET',
 						url: '/pixels/'+this.key+'/logs',
 						type: 'html' // i.e. don't try to parse
-					});
-				}.bind(this)).then(function(data) {
-					this.files['Logs'] = data.request.responseText;
-					this.updateTabs();
-					this.updateContent();
+					}).then(function(data) {
+						this.files['Logs'] = data;
+						this.updateTabs();
+						this.updateContent();
+					}.bind(this));
 				}.bind(this));
 			},
 			reload: function() {
@@ -87,17 +84,13 @@
 				this.reload();
 			},
 			ready: function() {
-				var oldFn = this.$.files.selectedChanged.bind(this.$.files);
-				this.$.files.selectedChanged = function() {
-					oldFn();
-					this.updateContent();
-				}.bind(this);
+				this.$.files.addEventListener('polymer-activate', this.updateContent.bind(this));
 				this.$.close.addEventListener('click', function() {
 					this.fire('close');
-				}.bind(this))
+				}.bind(this));
 				this.$.reload.addEventListener('click', function() {
 					this.reload();
-				}.bind(this))
+				}.bind(this));
 			},
 		});
 	</script>

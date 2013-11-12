@@ -29,19 +29,16 @@
 			var insp = document.getElementById('inspector');
 
 			conn.addEventListener('pixelCreate', function(ev) {
-				console.log('create', ev);
 				var pixel = document.createElement('pixel-pixel');
 				pixel.key = ev.detail;
 				pixel.id = ev.detail;
 				wall.appendChild(pixel);
 			});
 			conn.addEventListener('pixelChange', function(ev) {
-				console.log('change', ev);
 				document.getElementById(ev.detail).update(ev.detail)
 				document.getElementById(ev.detail).setCrashed(false);
 			});
 			conn.addEventListener('pixelCrash', function(ev) {
-				console.log('crash', ev);
 				document.getElementById(ev.detail).setCrashed(true);
 			});
 			wall.addEventListener('pixelClick', function(ev) {
@@ -58,7 +55,7 @@
 			});
 			insp.addEventListener('close', function() {
 				insp.className = 'hidden';
-			})
+			});
 			conn.href = window.location.host;
 		});
 	</script>
