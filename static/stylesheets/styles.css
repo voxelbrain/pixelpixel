@@ -1793,3 +1793,67 @@ pixel-codeinspector::part(tab).polymer-selected {
   color: #ffde00;
   background-color: #906cd7;
 }
+
+pixel-sidebar *[part=container] {
+  width: 256px;
+  left: 0;
+  background-color: #bfad30 !important;
+  -webkit-transition: left 0.4s ease-in-out;
+  -moz-transition: left 0.4s ease-in-out;
+  -o-transition: left 0.4s ease-in-out;
+  transition: left 0.4s ease-in-out;
+}
+pixel-sidebar *[part=container].hidden {
+  left: -256px;
+}
+
+pixel-sidebar *[part=button] {
+  color: #4711ae;
+  box-sizing: content-box;
+  padding: 5px;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s ease-in-out;
+  -moz-transition: background-color 0.2s ease-in-out;
+  -o-transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
+  background-color: #bfad30;
+}
+pixel-sidebar *[part=button]:hover {
+  background-color: #ffde00;
+}
+
+pixel-sidebar::part(container) {
+  width: 256px;
+  left: 0;
+  background-color: #bfad30 !important;
+  -webkit-transition: left 0.4s ease-in-out;
+  -moz-transition: left 0.4s ease-in-out;
+  -o-transition: left 0.4s ease-in-out;
+  transition: left 0.4s ease-in-out;
+}
+pixel-sidebar::part(container).hidden {
+  left: -256px;
+}
+
+pixel-sidebar::part(button) {
+  color: #4711ae;
+  box-sizing: content-box;
+  padding: 5px;
+  width: 32px;
+  height: 32px;
+  font-size: 32px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-transition: background-color 0.2s ease-in-out;
+  -moz-transition: background-color 0.2s ease-in-out;
+  -o-transition: background-color 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out;
+  background-color: #bfad30;
+}
+pixel-sidebar::part(button):hover {
+  background-color: #ffde00;
+}

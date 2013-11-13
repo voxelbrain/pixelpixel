@@ -13,6 +13,7 @@
     <link rel="import" href="/elements/pixelwall/pixelwall.html">
     <link rel="import" href="/elements/code/code.html">
     <link rel="import" href="/elements/codeinspector/codeinspector.html">
+    <link rel="import" href="/elements/sidebar/sidebar.html">
     <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-tabs/polymer-ui-tabs.html">
     <link rel="import" href="/elements/polymer-elements/polymer-selector/polymer-selector.html">
     <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-splitter/polymer-ui-splitter.html">
@@ -20,10 +21,10 @@
 <body>
 	<pixel-connection id="connection"></pixel-connection>
 	<pixel-codeinspector id="inspector" class="hidden"></pixel-codeinspector>
-	<div id="wall"></div>
 	<pixel-sidebar>
+		<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a><a href="http://godoc.org/github.com/voxelbrain/pixelpixel/pixelutils">Documentation</a></footer>
 	</pixel-sidebar>
-	<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a><a href="http://godoc.org/github.com/voxelbrain/pixelpixel/pixelutils">Documentation</a></footer>
+	<div id="wall"></div>
 	<script>
 		window.addEventListener('WebComponentsReady', function() {
 			var conn = document.getElementById('connection');

@@ -29,6 +29,10 @@ html, body {
 	font-family: 'Open Sans';
 }
 
+//
+// Code Inspector
+//
+
 pixel-codeinspector {
 	&.hidden {
 		display: none;
@@ -70,4 +74,54 @@ pixel-codeinspector::part(button) {
 
 pixel-codeinspector::part(tab) {
 	@include pixel-codeinspector-tabstyle;
+}
+
+//
+// Sidebar
+//
+
+@mixin pixel-sidebar-containerstyle {
+	$width: 256px;
+	width: $width;
+	left: 0;
+	background-color: $secondary2 !important;
+	&.hidden {
+		left: -$width;
+	}
+	@include single-transition(left, 0.4s, ease-in-out);
+}
+
+@mixin pixel-sidebar-buttonstyle {
+	color: $primary1;
+	box-sizing: content-box;
+	padding: 5px;
+	width: 32px;
+	height: 32px;
+	font-size: 32px;
+	text-align: center;
+	cursor: pointer;
+
+	@include single-transition(background-color, 0.2s, ease-in-out);
+	background-color: $secondary2;
+	&:hover {
+		background-color: $secondary1;
+	}
+}
+
+// No native ShadowDOM
+pixel-sidebar *[part=container] {
+	@include pixel-sidebar-containerstyle;
+}
+
+pixel-sidebar *[part=button] {
+	@include pixel-sidebar-buttonstyle;
+}
+
+// Native ShadowDOM
+pixel-sidebar::part(container) {
+	@include pixel-sidebar-containerstyle;
+}
+
+pixel-sidebar::part(button) {
+	@include pixel-sidebar-buttonstyle;
 }
