@@ -21,7 +21,7 @@ $secondary4: #FFE640; // bright
 $secondary5: #FFED73; // bright desaturated
 
 html, body {
-	padding: 0;
+	padding: 50px;
 	margin: 0;
 	position: relative;
 	background-color: $primary2;
@@ -124,4 +124,42 @@ pixel-sidebar::part(container) {
 
 pixel-sidebar::part(button) {
 	@include pixel-sidebar-buttonstyle;
+}
+
+//
+// Pixel
+//
+
+@mixin pixel-pixel-buttonstyle {
+	$size: 20px;
+	$gap: 5px;
+	color: $primary1;
+	box-sizing: content-box;
+	padding: 5px;
+	width: $size;
+	height: $size;
+	font-size: $size;
+	line-height: $size;
+	text-align: center;
+	cursor: pointer;
+	margin-bottom: $gap;
+	margin-left: $gap;
+
+	@include transition-property(opacity, background-color);
+	@include transition-duration(0.2s);
+	@include transition-timing-function(ease-in-out);
+	background-color: $secondary2;
+	&:hover {
+		background-color: $secondary1;
+	}
+}
+
+// No native ShadowDOM
+pixel-pixel *[part=button] {
+	@include pixel-pixel-buttonstyle;
+}
+
+// Native ShadowDOM
+pixel-pixel::part(button) {
+	@include pixel-pixel-buttonstyle;
 }

@@ -1744,7 +1744,7 @@
 }
 
 html, body {
-  padding: 0;
+  padding: 50px;
   margin: 0;
   position: relative;
   background-color: #482a83;
@@ -1855,5 +1855,65 @@ pixel-sidebar::part(button) {
   background-color: #bfad30;
 }
 pixel-sidebar::part(button):hover {
+  background-color: #ffde00;
+}
+
+pixel-pixel *[part=button] {
+  color: #4711ae;
+  box-sizing: content-box;
+  padding: 5px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  -webkit-transition-property: opacity, background-color;
+  -moz-transition-property: opacity, background-color;
+  -o-transition-property: opacity, background-color;
+  transition-property: opacity, background-color;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  background-color: #bfad30;
+}
+pixel-pixel *[part=button]:hover {
+  background-color: #ffde00;
+}
+
+pixel-pixel::part(button) {
+  color: #4711ae;
+  box-sizing: content-box;
+  padding: 5px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  -webkit-transition-property: opacity, background-color;
+  -moz-transition-property: opacity, background-color;
+  -o-transition-property: opacity, background-color;
+  transition-property: opacity, background-color;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  background-color: #bfad30;
+}
+pixel-pixel::part(button):hover {
   background-color: #ffde00;
 }
