@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*!
  *  Font Awesome 4.0.3 by @davegandy - http://fontawesome.io - @fontawesome
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
@@ -1738,62 +1737,4 @@
 
 .fa-plus-square-o:before {
   content: "\f196";
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html, body {
-  padding: 0;
-  margin: 0;
-  position: relative;
-  background-color: #482a83;
-  height: 100%;
-  font-family: 'Open Sans';
-}
-
-pixel-codeinspector.hidden {
-  display: none;
-}
-
-pixel-codeinspector .icon {
-  color: #7746d7;
-}
-pixel-codeinspector .icon:hover {
-  color: #ffe640;
-}
-
-pixel-codeinspector::part(button) {
-  color: #7746d7;
-}
-pixel-codeinspector::part(button):hover {
-  color: #ffe640;
-}
-
-footer {
-  display: none;
-  position: fixed;
-  height: 2em;
-  line-height: 2em;
-  bottom: 0;
-  width: 100%;
-  background-color: black;
-  -webkit-box-shadow: 0 0 25px 5px #333333;
-  -moz-box-shadow: 0 0 25px 5px #333333;
-  box-shadow: 0 0 25px 5px #333333;
-  color: white;
-}
-footer a {
-  text-decoration: none;
-}
-footer a:link, footer a:visited {
-  color: white;
-}
-footer a:hover {
-  color: #cccccc;
-}
-footer a:before {
-  margin-left: 20px;
-  content: "⇒";
 }

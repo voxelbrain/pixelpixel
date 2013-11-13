@@ -7,11 +7,11 @@
 		behaviour of the ShadwDOM polyfill -->
 		<pixel-code id="code"><code></code></pixel-code>
 
-		<div class="icon" id="close">
-			<div class="cross"></div>
+		<div class="icon" id="close" part="button">
+			<div class="fa fa-times-circle-o"></div>
 		</div>
-		<div class="icon" id="reload">
-			<div class="reload"></div>
+		<div class="icon" id="reload" part="button">
+			<div class="fa fa-refresh"></div>
 		</div>
 	</template>
 	<script>
@@ -28,6 +28,7 @@
 		}
 
 		Polymer('pixel-codeinspector', {
+			applyAuthorStyles: true,
 			key: '',
 			files: {},
 			empty: function() {

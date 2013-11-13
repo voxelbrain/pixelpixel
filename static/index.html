@@ -1,12 +1,12 @@
 <!doctype html>
 <head>
-	<link href="/templates/styles.css" rel="stylesheet" type="text/css" />
-	<link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
-
 	<script src="/js/lodash.min.js"></script>
 	<script src="/js/q.js"></script>
 	<script src="/js/reqwest.min.js"></script>
 	<script src="/js/polymer.min.js"></script>
+
+	<link href="/templates/styles.css" rel="stylesheet" type="text/css" />
+	<link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
 
     <link rel="import" href="/elements/pixel/pixel.html">
     <link rel="import" href="/elements/connection/connection.html">
@@ -21,6 +21,8 @@
 	<pixel-connection id="connection"></pixel-connection>
 	<pixel-codeinspector id="inspector" class="hidden"></pixel-codeinspector>
 	<div id="wall"></div>
+	<pixel-sidebar>
+	</pixel-sidebar>
 	<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a><a href="http://godoc.org/github.com/voxelbrain/pixelpixel/pixelutils">Documentation</a></footer>
 	<script>
 		window.addEventListener('WebComponentsReady', function() {

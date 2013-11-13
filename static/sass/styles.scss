@@ -2,47 +2,58 @@
 @import "compass/css3/transition";
 @import "compass/css3/opacity";
 @import "compass/css3/box-shadow";
+@import "font-awesome";
 
 * {
 	box-sizing: border-box;
 }
 
+$primary1: #4711AE; // full
+$primary2: #482A83; // dark desaturated
+$primary3: #2A0671; // dark
+$primary4: #7746D7; // bright
+$primary5: #906CD7; // bright desaturated
+
+$secondary1: #FFDE00; // full
+$secondary2: #BFAD30; // dark desaturated
+$secondary3: #A69000; // dark
+$secondary4: #FFE640; // bright
+$secondary5: #FFED73; // bright desaturated
+
 html, body {
 	padding: 0;
 	margin: 0;
 	position: relative;
-	background-color: black;
+	background-color: $primary2;
 	height: 100%;
 	font-family: 'Open Sans';
 }
 
 pixel-codeinspector {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: black;
-	padding: 50px 100px;
-	color: hsla(0, 0%, 80%, 1);
-	margin-bottom: 30px;
-	overflow: scroll;
 	&.hidden {
 		display: none;
 	}
-	z-index: 100;
 }
 
-pixel-pixelwall {
-	display: block;
-	&:after {
-		content: '';
-		display: block;
-		height: 50px;
+@mixin iconstyle {
+	color: $primary4;
+	&:hover {
+		color: $secondary4;
 	}
 }
 
+// No native ShadowDOM
+pixel-codeinspector .icon {
+	@include iconstyle;
+}
+
+// Native ShadowDOM
+pixel-codeinspector::part(button) {
+	@include iconstyle;
+}
+
 footer {
+	display: none;
 	position: fixed;
 	height: 2em;
 	line-height: 2em;
