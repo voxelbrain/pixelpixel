@@ -7,38 +7,51 @@
   * {
     display: inline-block;
     position: relative;
-    width: 70px;
-    height: 30px;
+    min-width: 60px;
+    height: 24px;
     overflow: hidden;
     border: 1px solid #b6b6b6;
-    border-radius: 3px;
+    border-radius: 2px;
     box-shadow: inset 0px 0px 1px 0 rgba(0,0,0,0.1);
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
     -webkit-transition: border 0.130s ease-out;
     transition: border 0.130s ease-out;
     cursor: pointer;
+    font-size: 10px;
   }
 
   *.on {
-    border: 1px solid #4584f2;
+    border: 1px solid #0fb2c6;
   }
 }
 
 .toggle {
   position: absolute;
-  left: -42px;
-  width: 112px;
+  left: -webkit-calc(-100% + 24px);
+  left: -moz-calc(-100% + 24px);
+  left: calc(-100% + 24px);
+  width: -webkit-calc(200% - 24px);
+  width: -moz-calc(200% - 24px);
+  width: calc(200% - 24px);
   height: 100%;
   overflow: hidden;
   white-space: nowrap;
-  -webkit-transition: left 0.130s ease-out;
+  /* Safari bug: https://bugs.webkit.org/show_bug.cgi?id=100568 */
+  /*-webkit-transition: left 0.130s ease-out;*/
   transition: left 0.130s ease-out;
 }
 
+/* workaround for https://github.com/Polymer/platform/issues/36 */
+/* @polyfill-unscoped-rule polymer-ui-toggle-button .toggle {
+  left: -webkit-calc(-100% + 24px);
+  width: -webkit-calc(200% - 24px);
+} */
+
 .toggle.dragging {
-  -webkit-transition: all 0;
-  transition: all 0;
+  -webkit-transition: none;
+  transition: none;
 }
 
 .toggle.on {
@@ -52,45 +65,33 @@
 .on-label, .off-label {
   width: 50%;
   height: 100%;
-  line-height: 30px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
-  text-align: center;
-  font-family: 'Helvetica Neue', Helvetica, Arial, 'open sans', sans-serif;
-  font-size: 10px;
 }
 
 .on-label {
-  padding-right: 14px;
-  background-color: #488afd;
+  padding-right: 12px;
+  background-color: #2fb2c6;
   color: white;
 }
 
 .off-label {
-  padding-left: 14px;
+  padding-left: 12px;
   background-color: #bfbfbf;
   color: #716f6f;
 }
 
 .thumb {
   position: absolute;
-  left: 42px;
-  width: 28px;
+  left: -webkit-calc(50% - 12px);
+  left: -moz-calc(50% - 12px);
+  left: calc(50% - 12px);
+  width: 24px;
   height: 100%;
-  border-radius: 2px;
+  border-radius: 1px;
   background-color: white;
 }
 
-.thumb::after {
-  content: "";
-  position: absolute;
-  display: block;
-  top: 10px;
-  left: 11px;
-  height: 10px;
-  width: 8px;
-  background-image: -webkit-linear-gradient(left, #d4d3d3 40%, transparent 40%);
-  background-image: -moz-linear-gradient(left, #d4d3d3 40%, transparent 40%);
-  background-image: -ms-linear-gradient(left, #d4d3d3 40%, transparent 40%);
-  background-size: 4px;
-}
+/* @polyfill-unscoped-rule polymer-ui-toggle-button .thumb {
+  left: -webkit-calc(50% - 12px);
+} */

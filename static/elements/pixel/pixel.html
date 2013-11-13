@@ -29,6 +29,9 @@
 					this.fire('headerClick', this.key)
 				}.bind(this));
 			},
+			setCrashed: function(b) {
+				this.$.canvas.className = b?"crashed":"";
+			},
 			keyChanged: function() {
 				this.update();
 			},

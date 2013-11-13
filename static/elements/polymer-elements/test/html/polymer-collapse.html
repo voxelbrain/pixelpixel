@@ -3,8 +3,8 @@
   <head>
     <title>polymer-collapse</title>
     <script src="../../../polymer/polymer.js"></script>
-    <script src="../../../polymer/tools/test/htmltest.js"></script>
-    <script src="../../node_modules/chai/chai.js"></script>
+    <script src="../../../tools/test/htmltest.js"></script>
+    <script src="../../../tools/test/chai/chai.js"></script>
     <link rel="import" href="../../polymer-collapse/polymer-collapse.html">
   </head>
   <body>
@@ -16,24 +16,41 @@
     
     <script>
       var assert = chai.assert;
+      var delay = 200;
       document.addEventListener('WebComponentsReady', function() {
         var c = document.querySelector('#collapse');
-        var origH = getBoxHeight();
-        assert.notEqual(origH, 0);
-        c.closed = true;
+        assert.equal(c.closed, false);
+        Platform.flush();
         setTimeout(function() {
-          assert.equal(getBoxHeight(), 0);
-          c.closed = false;
+          var origH = getBoxComputedHeight();
+          assert.notEqual(origH, 0);
+          c.closed = true;
+          Platform.flush();
           setTimeout(function() {
-            assert.equal(getBoxHeight(), origH);
-            done();
-          }, 200);
-        }, 200);
+            // after closed, height is 0
+            assert.equal(getBoxComputedHeight(), 0);
+            // should be set to display: none
+            assert.equal(getBoxComputedStyle().display, 'none');
+            c.closed = false;
+            Platform.flush();
+            setTimeout(function() {
+              // verify computed height
+              assert.equal(getBoxComputedHeight(), origH);
+              // after opened, height is set to 'auto'
+              assert.equal(document.querySelector('#box').style.height, 'auto');
+              done();
+            }, delay);
+          }, delay);
+        }, delay);
       });
       
-      function getBoxHeight() {
+      function getBoxComputedStyle() {
         var b = document.querySelector('#box');
-        return parseInt(getComputedStyle(b).height);
+        return getComputedStyle(b);
+      }
+      
+      function getBoxComputedHeight() {
+        return parseInt(getBoxComputedStyle().height);
       }
     </script>
   </body>

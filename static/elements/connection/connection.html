@@ -9,11 +9,26 @@
 			ws: null,
 			href: '',
 			hrefChanged: function() {
-				this.ws = new WebSocket(this.href);
+				this.ws = new WebSocket('ws://'+this.href+'/ws');
 				this.ws.onmessage = this.message.bind(this);
 				this.ws.onclose = function() {
 					alert('WebSocket connection lost');
 				}
+				this.readInitialState();
+			},
+			readInitialState: function() {
+				reqwest({
+					url: '/pixels',
+					method: 'GET',
+					type: 'json'
+				}).then(function(data) {
+					_(data).each(function(pixel) {
+						this.fire('pixelCreate', pixel.id);
+						if(pixel.broken) {
+							this.fire('pixelCrash', pixel.id);
+						}
+					}.bind(this));
+				}.bind(this))
 			},
 			message: function(ev) {
 				event = JSON.parse(ev.data);

@@ -18,21 +18,21 @@
 	</template>
 	<script>
 		Polymer('pixel-code', {
-			language: "none",
+			language: 'none',
 			languageChanged: function() {
 				this.update();
 			},
 			getText: function() {
 				var nodes = this.$.plaincode.getDistributedNodes();
 				var text = "";
-				[].forEach.call(nodes, function(node) {
+				_(nodes).each(function(node) {
 					text += node.innerText || node.textContent;
 				});
 				return text;
 			},
 			update: function() {
 				switch(this.language) {
-					case "go":
+					case 'go':
 						Rainbow.color(this.getText(), 'go', function(code) {
 							this.$.styledcode.innerHTML = code;
 						}.bind(this));
@@ -41,7 +41,7 @@
 						this.$.styledcode.innerText = this.getText();
 					break;
 				}
-			},
+			}
 		});
 	</script>
 </polymer-element>

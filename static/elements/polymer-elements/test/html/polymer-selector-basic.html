@@ -3,9 +3,18 @@
   <head>
     <title>polymer-selector-basic</title>
     <script src="../../../polymer/polymer.js"></script>
-    <script src="../../../polymer/tools/test/htmltest.js"></script>
-    <script src="../../node_modules/chai/chai.js"></script>
+    <script src="../../../tools/test/htmltest.js"></script>
+    <script src="../../../tools/test/chai/chai.js"></script>
     <link rel="import" href="../../polymer-selector/polymer-selector.html">
+    <style>
+      .polymer-selected {
+        background: #ccc;
+      }
+      
+      .my-selected {
+        background: red;
+      }
+    </style>
   </head>
   <body>
 
@@ -17,6 +26,8 @@
       <div>Item 5</div>
     </polymer-selector>
     
+    <br><br>
+    
     <polymer-selector id="selector2" selected="item3" selectedClass="my-selected" valueattr="id">
       <div id="item1">Item 1</div>
       <div id="item2">Item 2</div>
@@ -27,6 +38,7 @@
     
     <script>
       var assert = chai.assert;
+      var async = requestAnimationFrame;
       document.addEventListener('WebComponentsReady', function() {
         // selector1
         var s = document.querySelector('#selector1');
@@ -39,7 +51,36 @@
         s = document.querySelector('#selector2');
         assert.equal(s.selected, "item3");
         assert.equal(s.selectedClass, 'my-selected');
-        done();
+        // setup listener for polymer-select event
+        var selectEventCounter = 0;
+        s.addEventListener('polymer-select', function(e) {
+          if (e.detail.isSelected) {
+            selectEventCounter++;
+            // selectedItem and detail.item should be the same
+            assert.equal(e.detail.item, s.selectedItem);
+          }
+        });
+        new PathObserver(s, 'selected', function() {
+          // check polymer-select event
+          assert.equal(selectEventCounter, 1);
+          // check selected class
+          assert.isTrue(s.children[4].classList.contains('my-selected'));
+          // check selectedItem
+          assert.equal(s.selectedItem, s.children[4]);
+          // selecting the same value shouldn't fire polymer-select
+          selectEventCounter = 0;
+          s.selected = 'item5';
+          Platform.flush();
+          // TODO(ffu): would be better to wait for something to happen
+          // instead of not to happen
+          setTimeout(function() {
+            assert.equal(selectEventCounter, 0);
+            done();
+          }, 50);
+        });
+        // set selected
+        s.selected = 'item5';
+        Platform.flush();
       });
     </script>
   </body>
