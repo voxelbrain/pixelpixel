@@ -35,45 +35,39 @@ pixel-codeinspector {
 	}
 }
 
-@mixin iconstyle {
+@mixin pixel-codeinspector-buttonstyle {
 	color: $primary4;
 	&:hover {
 		color: $secondary4;
 	}
 }
 
+@mixin pixel-codeinspector-tabstyle {
+	color: $secondary1;
+	background-color: $primary2;
+	&:hover {
+		background-color: $primary4;
+	}
+	&.polymer-selected {
+		color: $secondary1;
+		background-color: $primary5;
+	}
+}
+
 // No native ShadowDOM
-pixel-codeinspector .icon {
-	@include iconstyle;
+pixel-codeinspector *[part=button] {
+	@include pixel-codeinspector-buttonstyle;
+}
+
+pixel-codeinspector *[part=tab] {
+	@include pixel-codeinspector-tabstyle;
 }
 
 // Native ShadowDOM
 pixel-codeinspector::part(button) {
-	@include iconstyle;
+	@include pixel-codeinspector-buttonstyle;
 }
 
-footer {
-	display: none;
-	position: fixed;
-	height: 2em;
-	line-height: 2em;
-	bottom: 0;
-	width: 100%;
-	background-color: black;
-	@include single-box-shadow(lighten(black, 20%), 0, 0, 25px, 5px);
-	color: white;
-	a {
-		text-decoration: none;
-		&:link, &:visited {
-			color: white;
-		}
-		&:hover {
-			color: darken(white, 20%);
-		}
-		&:before {
-			margin-left: 20px;
-			content: '⇒'
-		}
-	}
+pixel-codeinspector::part(tab) {
+	@include pixel-codeinspector-tabstyle;
 }
-

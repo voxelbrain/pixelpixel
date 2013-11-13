@@ -1,17 +1,21 @@
 <polymer-element name="pixel-codeinspector" attributes="key">
 	<template>
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
-		<polymer-ui-tabs id="files" valueattr="innerText">
-		</polymer-ui-tabs>
-		<!-- FIXME: The inner code block is a temporary fix for the
-		behaviour of the ShadwDOM polyfill -->
-		<pixel-code id="code"><code></code></pixel-code>
-
-		<div class="icon" id="close" part="button">
-			<div class="fa fa-times-circle-o"></div>
+		<div class="background">
 		</div>
-		<div class="icon" id="reload" part="button">
-			<div class="fa fa-refresh"></div>
+		<div class="dialog">
+			<polymer-ui-tabs id="files" valueattr="innerText">
+			</polymer-ui-tabs>
+			<!-- FIXME: The inner code block is a temporary fix for the
+			behaviour of the ShadwDOM polyfill -->
+			<pixel-code id="code"><code></code></pixel-code>
+
+			<div class="icon" id="close" part="button">
+				<div class="fa fa-times-circle-o"></div>
+			</div>
+			<div class="icon" id="reload" part="button">
+				<div class="fa fa-refresh"></div>
+			</div>
 		</div>
 	</template>
 	<script>
@@ -23,6 +27,7 @@
 
 		function newTabNode(title) {
 			var node = document.createElement('span');
+			node.setAttribute('part', 'tab');
 			node.innerText = title;
 			return node;
 		}
