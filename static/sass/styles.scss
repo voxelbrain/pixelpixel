@@ -16,12 +16,16 @@ $saturated2: #BE7027;
 $animation-duration: 0.2s;
 
 html, body {
-	padding: 50px;
+	padding: 0;
 	margin: 0;
 	position: relative;
 	background-color: $dark1;
 	height: 100%;
 	font-family: 'Open Sans';
+}
+
+html {
+	padding: 50px;
 }
 
 //

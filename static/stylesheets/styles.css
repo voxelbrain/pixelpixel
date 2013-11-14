@@ -1744,12 +1744,16 @@
 }
 
 html, body {
-  padding: 50px;
+  padding: 0;
   margin: 0;
   position: relative;
   background-color: #202d57;
   height: 100%;
   font-family: 'Open Sans';
+}
+
+html {
+  padding: 50px;
 }
 
 pixel-codeinspector.hidden {
