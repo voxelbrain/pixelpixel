@@ -8,23 +8,18 @@
 	box-sizing: border-box;
 }
 
-$primary1: #4711AE; // full
-$primary2: #482A83; // dark desaturated
-$primary3: #2A0671; // dark
-$primary4: #7746D7; // bright
-$primary5: #906CD7; // bright desaturated
-
-$secondary1: #FFDE00; // full
-$secondary2: #BFAD30; // dark desaturated
-$secondary3: #A69000; // dark
-$secondary4: #FFE640; // bright
-$secondary5: #FFED73; // bright desaturated
+$dark1: #202D57;
+$light1: #EFDDCB;
+$light2: #FFF9EA;
+$saturated1: #D8892C;
+$saturated2: #BE7027;
+$animation-duration: 0.2s;
 
 html, body {
 	padding: 50px;
 	margin: 0;
 	position: relative;
-	background-color: $primary2;
+	background-color: $dark1;
 	height: 100%;
 	font-family: 'Open Sans';
 }
@@ -40,21 +35,22 @@ pixel-codeinspector {
 }
 
 @mixin pixel-codeinspector-buttonstyle {
-	color: $primary4;
+	color: $saturated1;
 	&:hover {
-		color: $secondary4;
+		color: $light1;
 	}
 }
 
 @mixin pixel-codeinspector-tabstyle {
-	color: $secondary1;
-	background-color: $primary2;
+	color: $light1;
+	background-color: $dark1;
 	&:hover {
-		background-color: $primary4;
+		color: $light1;
+		background-color: $saturated2;
 	}
 	&.polymer-selected {
-		color: $secondary1;
-		background-color: $primary5;
+		color: $light1;
+		background-color: $saturated1;
 	}
 }
 
@@ -84,7 +80,7 @@ pixel-codeinspector::part(tab) {
 	$width: 256px;
 	width: $width;
 	left: 0;
-	background-color: $secondary2 !important;
+	background-color: $saturated2;
 	&.hidden {
 		left: -$width;
 	}
@@ -92,7 +88,7 @@ pixel-codeinspector::part(tab) {
 }
 
 @mixin pixel-sidebar-buttonstyle {
-	color: $primary1;
+	color: $light2;
 	box-sizing: content-box;
 	padding: 5px;
 	width: 32px;
@@ -101,10 +97,10 @@ pixel-codeinspector::part(tab) {
 	text-align: center;
 	cursor: pointer;
 
-	@include single-transition(background-color, 0.2s, ease-in-out);
-	background-color: $secondary2;
+	@include single-transition(background-color, $animation-duration, ease-in-out);
+	background-color: $saturated2;
 	&:hover {
-		background-color: $secondary1;
+		background-color: $saturated1;
 	}
 }
 
@@ -130,10 +126,28 @@ pixel-sidebar::part(button) {
 // Pixel
 //
 
+$border: 5px;
+
+pixel-pixel {
+	margin: 20px;
+	line-height: 256px;
+	width: 256px;
+	height: 256px;
+	box-sizing: content-box;
+	@include single-transition(border-color, $animation-duration, ease-in-out);
+	border-width: $border;
+	border-style: solid;
+	border-color: transparentize($saturated2, 1.0);
+	&:hover {
+		border-color: $saturated2;
+	}
+}
+
 @mixin pixel-pixel-buttonstyle {
 	$size: 20px;
 	$gap: 5px;
-	color: $primary1;
+	margin-top: -$border;
+	color: $light2;
 	box-sizing: content-box;
 	padding: 5px;
 	width: $size;
@@ -146,11 +160,11 @@ pixel-sidebar::part(button) {
 	margin-left: $gap;
 
 	@include transition-property(opacity, background-color);
-	@include transition-duration(0.2s);
+	@include transition-duration($animation-duration);
 	@include transition-timing-function(ease-in-out);
-	background-color: $secondary2;
+	background-color: $saturated2;
 	&:hover {
-		background-color: $secondary1;
+		background-color: $saturated1;
 	}
 }
 

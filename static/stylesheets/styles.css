@@ -1747,7 +1747,7 @@ html, body {
   padding: 50px;
   margin: 0;
   position: relative;
-  background-color: #482a83;
+  background-color: #202d57;
   height: 100%;
   font-family: 'Open Sans';
 }
@@ -1757,47 +1757,49 @@ pixel-codeinspector.hidden {
 }
 
 pixel-codeinspector *[part=button] {
-  color: #7746d7;
+  color: #d8892c;
 }
 pixel-codeinspector *[part=button]:hover {
-  color: #ffe640;
+  color: #efddcb;
 }
 
 pixel-codeinspector *[part=tab] {
-  color: #ffde00;
-  background-color: #482a83;
+  color: #efddcb;
+  background-color: #202d57;
 }
 pixel-codeinspector *[part=tab]:hover {
-  background-color: #7746d7;
+  color: #efddcb;
+  background-color: #be7027;
 }
 pixel-codeinspector *[part=tab].polymer-selected {
-  color: #ffde00;
-  background-color: #906cd7;
+  color: #efddcb;
+  background-color: #d8892c;
 }
 
 pixel-codeinspector::part(button) {
-  color: #7746d7;
+  color: #d8892c;
 }
 pixel-codeinspector::part(button):hover {
-  color: #ffe640;
+  color: #efddcb;
 }
 
 pixel-codeinspector::part(tab) {
-  color: #ffde00;
-  background-color: #482a83;
+  color: #efddcb;
+  background-color: #202d57;
 }
 pixel-codeinspector::part(tab):hover {
-  background-color: #7746d7;
+  color: #efddcb;
+  background-color: #be7027;
 }
 pixel-codeinspector::part(tab).polymer-selected {
-  color: #ffde00;
-  background-color: #906cd7;
+  color: #efddcb;
+  background-color: #d8892c;
 }
 
 pixel-sidebar *[part=container] {
   width: 256px;
   left: 0;
-  background-color: #bfad30 !important;
+  background-color: #be7027;
   -webkit-transition: left 0.4s ease-in-out;
   -moz-transition: left 0.4s ease-in-out;
   -o-transition: left 0.4s ease-in-out;
@@ -1808,7 +1810,7 @@ pixel-sidebar *[part=container].hidden {
 }
 
 pixel-sidebar *[part=button] {
-  color: #4711ae;
+  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1820,16 +1822,16 @@ pixel-sidebar *[part=button] {
   -moz-transition: background-color 0.2s ease-in-out;
   -o-transition: background-color 0.2s ease-in-out;
   transition: background-color 0.2s ease-in-out;
-  background-color: #bfad30;
+  background-color: #be7027;
 }
 pixel-sidebar *[part=button]:hover {
-  background-color: #ffde00;
+  background-color: #d8892c;
 }
 
 pixel-sidebar::part(container) {
   width: 256px;
   left: 0;
-  background-color: #bfad30 !important;
+  background-color: #be7027;
   -webkit-transition: left 0.4s ease-in-out;
   -moz-transition: left 0.4s ease-in-out;
   -o-transition: left 0.4s ease-in-out;
@@ -1840,7 +1842,7 @@ pixel-sidebar::part(container).hidden {
 }
 
 pixel-sidebar::part(button) {
-  color: #4711ae;
+  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1852,14 +1854,33 @@ pixel-sidebar::part(button) {
   -moz-transition: background-color 0.2s ease-in-out;
   -o-transition: background-color 0.2s ease-in-out;
   transition: background-color 0.2s ease-in-out;
-  background-color: #bfad30;
+  background-color: #be7027;
 }
 pixel-sidebar::part(button):hover {
-  background-color: #ffde00;
+  background-color: #d8892c;
+}
+
+pixel-pixel {
+  margin: 20px;
+  line-height: 256px;
+  width: 256px;
+  height: 256px;
+  box-sizing: content-box;
+  -webkit-transition: border-color 0.2s ease-in-out;
+  -moz-transition: border-color 0.2s ease-in-out;
+  -o-transition: border-color 0.2s ease-in-out;
+  transition: border-color 0.2s ease-in-out;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(190, 112, 39, 0);
+}
+pixel-pixel:hover {
+  border-color: #be7027;
 }
 
 pixel-pixel *[part=button] {
-  color: #4711ae;
+  margin-top: -5px;
+  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 20px;
@@ -1882,14 +1903,15 @@ pixel-pixel *[part=button] {
   -moz-transition-timing-function: ease-in-out;
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
-  background-color: #bfad30;
+  background-color: #be7027;
 }
 pixel-pixel *[part=button]:hover {
-  background-color: #ffde00;
+  background-color: #d8892c;
 }
 
 pixel-pixel::part(button) {
-  color: #4711ae;
+  margin-top: -5px;
+  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 20px;
@@ -1912,8 +1934,8 @@ pixel-pixel::part(button) {
   -moz-transition-timing-function: ease-in-out;
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
-  background-color: #bfad30;
+  background-color: #be7027;
 }
 pixel-pixel::part(button):hover {
-  background-color: #ffde00;
+  background-color: #d8892c;
 }
