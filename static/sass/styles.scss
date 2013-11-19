@@ -2,67 +2,182 @@
 @import "compass/css3/transition";
 @import "compass/css3/opacity";
 @import "compass/css3/box-shadow";
+@import "font-awesome";
 
 * {
 	box-sizing: border-box;
 }
 
+$dark1: #202D57;
+$light1: #EFDDCB;
+$light2: #FFF9EA;
+$saturated1: #D8892C;
+$saturated2: #BE7027;
+$animation-duration: 0.2s;
+
 html, body {
 	padding: 0;
 	margin: 0;
 	position: relative;
-	background-color: black;
+	background-color: $dark1;
+	color: $light1;
 	height: 100%;
 	font-family: 'Open Sans';
 }
 
+html {
+	padding: 50px;
+}
+
+//
+// Code Inspector
+//
+
 pixel-codeinspector {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: black;
-	padding: 50px 100px;
-	color: hsla(0, 0%, 80%, 1);
-	margin-bottom: 30px;
-	overflow: scroll;
 	&.hidden {
 		display: none;
 	}
-	z-index: 100;
 }
 
-pixel-pixelwall {
-	display: block;
-	&:after {
-		content: '';
-		display: block;
-		height: 50px;
+@mixin pixel-codeinspector-buttonstyle {
+	color: $saturated1;
+	&:hover {
+		color: $light1;
 	}
 }
 
-footer {
-	position: fixed;
-	height: 2em;
-	line-height: 2em;
-	bottom: 0;
-	width: 100%;
-	background-color: black;
-	@include single-box-shadow(lighten(black, 20%), 0, 0, 25px, 5px);
-	color: white;
-	a {
-		text-decoration: none;
-		&:link, &:visited {
-			color: white;
-		}
-		&:hover {
-			color: darken(white, 20%);
-		}
-		&:before {
-			margin-left: 20px;
-			content: '⇒'
-		}
+@mixin pixel-codeinspector-tabstyle {
+	color: $light1;
+	background-color: $dark1;
+	&:hover {
+		color: $light1;
+		background-color: $saturated2;
+	}
+	&.polymer-selected {
+		color: $light1;
+		background-color: $saturated1;
 	}
 }
 
+// No native ShadowDOM
+pixel-codeinspector *[part=button] {
+	@include pixel-codeinspector-buttonstyle;
+}
+
+pixel-codeinspector *[part=tab] {
+	@include pixel-codeinspector-tabstyle;
+}
+
+// Native ShadowDOM
+pixel-codeinspector::part(button) {
+	@include pixel-codeinspector-buttonstyle;
+}
+
+pixel-codeinspector::part(tab) {
+	@include pixel-codeinspector-tabstyle;
+}
+
+//
+// Sidebar
+//
+
+@mixin pixel-sidebar-containerstyle {
+	$width: 256px;
+	width: $width;
+	left: 0;
+	background-color: $saturated2;
+	&.hidden {
+		left: -$width;
+	}
+	@include single-transition(left, 0.4s, ease-in-out);
+}
+
+@mixin pixel-sidebar-buttonstyle {
+	color: $light2;
+	box-sizing: content-box;
+	padding: 5px;
+	width: 32px;
+	height: 32px;
+	font-size: 32px;
+	text-align: center;
+	cursor: pointer;
+
+	@include single-transition(background-color, $animation-duration, ease-in-out);
+	background-color: $saturated2;
+	&:hover {
+		background-color: $saturated1;
+	}
+}
+
+// No native ShadowDOM
+pixel-sidebar *[part=container] {
+	@include pixel-sidebar-containerstyle;
+}
+
+pixel-sidebar *[part=button] {
+	@include pixel-sidebar-buttonstyle;
+}
+
+// Native ShadowDOM
+pixel-sidebar::part(container) {
+	@include pixel-sidebar-containerstyle;
+}
+
+pixel-sidebar::part(button) {
+	@include pixel-sidebar-buttonstyle;
+}
+
+//
+// Pixel
+//
+
+$pixel-border: 5px;
+$pixel-button-size: 20px;
+
+pixel-pixel {
+	line-height: 256px;
+	width: 256px;
+	height: 256px;
+	box-sizing: content-box;
+	@include single-transition(border-color, $animation-duration, ease-in-out);
+	border-width: $pixel-border;
+	border-style: solid;
+	border-color: transparentize($saturated2, 1.0);
+	margin-right: $pixel-button-size + 2*$pixel-border;
+	&:hover {
+		border-color: $saturated2;
+	}
+}
+
+@mixin pixel-pixel-buttonstyle {
+	margin-top: -$pixel-border;
+	color: $light2;
+	box-sizing: content-box;
+	padding: 5px;
+	width: $pixel-button-size;
+	height: $pixel-button-size;
+	font-size: $pixel-button-size;
+	line-height: $pixel-button-size;
+	text-align: center;
+	cursor: pointer;
+	margin-bottom: $pixel-border;
+	margin-left: $pixel-border;
+
+	@include transition-property(opacity, background-color);
+	@include transition-duration($animation-duration);
+	@include transition-timing-function(ease-in-out);
+	background-color: $saturated2;
+	&:hover {
+		background-color: $saturated1;
+	}
+}
+
+// No native ShadowDOM
+pixel-pixel *[part=button] {
+	@include pixel-pixel-buttonstyle;
+}
+
+// Native ShadowDOM
+pixel-pixel::part(button) {
+	@include pixel-pixel-buttonstyle;
+}
