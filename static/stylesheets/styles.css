@@ -1748,6 +1748,7 @@ html, body {
   margin: 0;
   position: relative;
   background-color: #202d57;
+  color: #efddcb;
   height: 100%;
   font-family: 'Open Sans';
 }
@@ -1865,7 +1866,6 @@ pixel-sidebar::part(button):hover {
 }
 
 pixel-pixel {
-  margin: 20px;
   line-height: 256px;
   width: 256px;
   height: 256px;
