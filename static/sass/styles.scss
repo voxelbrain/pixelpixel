@@ -131,7 +131,8 @@ pixel-sidebar::part(button) {
 // Pixel
 //
 
-$border: 5px;
+$pixel-border: 5px;
+$pixel-button-size: 20px;
 
 pixel-pixel {
 	line-height: 256px;
@@ -139,29 +140,28 @@ pixel-pixel {
 	height: 256px;
 	box-sizing: content-box;
 	@include single-transition(border-color, $animation-duration, ease-in-out);
-	border-width: $border;
+	border-width: $pixel-border;
 	border-style: solid;
 	border-color: transparentize($saturated2, 1.0);
+	margin-right: $pixel-button-size + 2*$pixel-border;
 	&:hover {
 		border-color: $saturated2;
 	}
 }
 
 @mixin pixel-pixel-buttonstyle {
-	$size: 20px;
-	$gap: 5px;
-	margin-top: -$border;
+	margin-top: -$pixel-border;
 	color: $light2;
 	box-sizing: content-box;
 	padding: 5px;
-	width: $size;
-	height: $size;
-	font-size: $size;
-	line-height: $size;
+	width: $pixel-button-size;
+	height: $pixel-button-size;
+	font-size: $pixel-button-size;
+	line-height: $pixel-button-size;
 	text-align: center;
 	cursor: pointer;
-	margin-bottom: $gap;
-	margin-left: $gap;
+	margin-bottom: $pixel-border;
+	margin-left: $pixel-border;
 
 	@include transition-property(opacity, background-color);
 	@include transition-duration($animation-duration);

@@ -1877,6 +1877,7 @@ pixel-pixel {
   border-width: 5px;
   border-style: solid;
   border-color: rgba(190, 112, 39, 0);
+  margin-right: 30px;
 }
 pixel-pixel:hover {
   border-color: #be7027;
