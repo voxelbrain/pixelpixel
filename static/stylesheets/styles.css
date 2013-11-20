@@ -1747,8 +1747,8 @@ html, body {
   padding: 0;
   margin: 0;
   position: relative;
-  background-color: #202d57;
-  color: #efddcb;
+  background-color: white;
+  color: black;
   height: 100%;
   font-family: 'Open Sans';
 }
@@ -1762,60 +1762,118 @@ pixel-codeinspector.hidden {
 }
 
 pixel-codeinspector *[part=button] {
-  color: #d8892c;
+  color: #954c46;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
 }
 pixel-codeinspector *[part=button]:hover {
-  color: #efddcb;
+  color: #d73e32;
 }
 
 pixel-codeinspector *[part=tab] {
-  color: #efddcb;
-  background-color: #202d57;
+  color: white;
+  background-color: #410500;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
 }
 pixel-codeinspector *[part=tab]:hover {
-  color: #efddcb;
-  background-color: #be7027;
+  color: white;
+  background-color: #954c46;
 }
 pixel-codeinspector *[part=tab].polymer-selected {
-  color: #efddcb;
-  background-color: #d8892c;
+  color: white;
+  background-color: #d73e32;
 }
 
 pixel-codeinspector::part(button) {
-  color: #d8892c;
+  color: #954c46;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
 }
 pixel-codeinspector::part(button):hover {
-  color: #efddcb;
+  color: #d73e32;
 }
 
 pixel-codeinspector::part(tab) {
-  color: #efddcb;
-  background-color: #202d57;
+  color: white;
+  background-color: #410500;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
 }
 pixel-codeinspector::part(tab):hover {
-  color: #efddcb;
-  background-color: #be7027;
+  color: white;
+  background-color: #954c46;
 }
 pixel-codeinspector::part(tab).polymer-selected {
-  color: #efddcb;
-  background-color: #d8892c;
+  color: white;
+  background-color: #d73e32;
 }
 
 pixel-sidebar *[part=container] {
   width: 256px;
+  background-color: white;
+  -webkit-box-shadow: -10px 0px 40px 10px #ffa49d;
+  -moz-box-shadow: -10px 0px 40px 10px #ffa49d;
+  box-shadow: -10px 0px 40px 10px #ffa49d;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
   left: 0;
-  background-color: #be7027;
-  -webkit-transition: left 0.4s ease-in-out;
-  -moz-transition: left 0.4s ease-in-out;
-  -o-transition: left 0.4s ease-in-out;
-  transition: left 0.4s ease-in-out;
 }
 pixel-sidebar *[part=container].hidden {
   left: -256px;
 }
 
 pixel-sidebar *[part=button] {
-  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1823,31 +1881,52 @@ pixel-sidebar *[part=button] {
   font-size: 32px;
   text-align: center;
   cursor: pointer;
-  -webkit-transition: background-color 0.2s ease-in-out;
-  -moz-transition: background-color 0.2s ease-in-out;
-  -o-transition: background-color 0.2s ease-in-out;
-  transition: background-color 0.2s ease-in-out;
-  background-color: #be7027;
+  position: relative;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  color: #ffedeb;
+  background-color: #d73e32;
 }
 pixel-sidebar *[part=button]:hover {
-  background-color: #d8892c;
+  color: #410500;
+  background-color: #d73e32;
 }
 
 pixel-sidebar::part(container) {
   width: 256px;
+  background-color: white;
+  -webkit-box-shadow: -10px 0px 40px 10px #ffa49d;
+  -moz-box-shadow: -10px 0px 40px 10px #ffa49d;
+  box-shadow: -10px 0px 40px 10px #ffa49d;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
   left: 0;
-  background-color: #be7027;
-  -webkit-transition: left 0.4s ease-in-out;
-  -moz-transition: left 0.4s ease-in-out;
-  -o-transition: left 0.4s ease-in-out;
-  transition: left 0.4s ease-in-out;
 }
 pixel-sidebar::part(container).hidden {
   left: -256px;
 }
 
 pixel-sidebar::part(button) {
-  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1855,14 +1934,25 @@ pixel-sidebar::part(button) {
   font-size: 32px;
   text-align: center;
   cursor: pointer;
-  -webkit-transition: background-color 0.2s ease-in-out;
-  -moz-transition: background-color 0.2s ease-in-out;
-  -o-transition: background-color 0.2s ease-in-out;
-  transition: background-color 0.2s ease-in-out;
-  background-color: #be7027;
+  position: relative;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  color: #ffedeb;
+  background-color: #d73e32;
 }
 pixel-sidebar::part(button):hover {
-  background-color: #d8892c;
+  color: #410500;
+  background-color: #d73e32;
 }
 
 pixel-pixel {
@@ -1870,22 +1960,29 @@ pixel-pixel {
   width: 256px;
   height: 256px;
   box-sizing: content-box;
-  -webkit-transition: border-color 0.2s ease-in-out;
-  -moz-transition: border-color 0.2s ease-in-out;
-  -o-transition: border-color 0.2s ease-in-out;
-  transition: border-color 0.2s ease-in-out;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.2s;
+  -moz-transition-duration: 0.2s;
+  -o-transition-duration: 0.2s;
+  transition-duration: 0.2s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
   border-width: 5px;
   border-style: solid;
-  border-color: rgba(190, 112, 39, 0);
+  border-color: rgba(215, 62, 50, 0);
   margin-right: 30px;
 }
 pixel-pixel:hover {
-  border-color: #be7027;
+  border-color: #d73e32;
 }
 
 pixel-pixel *[part=button] {
   margin-top: -5px;
-  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 20px;
@@ -1896,10 +1993,10 @@ pixel-pixel *[part=button] {
   cursor: pointer;
   margin-bottom: 5px;
   margin-left: 5px;
-  -webkit-transition-property: opacity, background-color;
-  -moz-transition-property: opacity, background-color;
-  -o-transition-property: opacity, background-color;
-  transition-property: opacity, background-color;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
   -webkit-transition-duration: 0.2s;
   -moz-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
@@ -1908,15 +2005,16 @@ pixel-pixel *[part=button] {
   -moz-transition-timing-function: ease-in-out;
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
-  background-color: #be7027;
+  color: #ffedeb;
+  background-color: #d73e32;
 }
 pixel-pixel *[part=button]:hover {
-  background-color: #d8892c;
+  color: #410500;
+  background-color: #d73e32;
 }
 
 pixel-pixel::part(button) {
   margin-top: -5px;
-  color: #fff9ea;
   box-sizing: content-box;
   padding: 5px;
   width: 20px;
@@ -1927,10 +2025,10 @@ pixel-pixel::part(button) {
   cursor: pointer;
   margin-bottom: 5px;
   margin-left: 5px;
-  -webkit-transition-property: opacity, background-color;
-  -moz-transition-property: opacity, background-color;
-  -o-transition-property: opacity, background-color;
-  transition-property: opacity, background-color;
+  -webkit-transition-property: all;
+  -moz-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
   -webkit-transition-duration: 0.2s;
   -moz-transition-duration: 0.2s;
   -o-transition-duration: 0.2s;
@@ -1939,8 +2037,10 @@ pixel-pixel::part(button) {
   -moz-transition-timing-function: ease-in-out;
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
-  background-color: #be7027;
+  color: #ffedeb;
+  background-color: #d73e32;
 }
 pixel-pixel::part(button):hover {
-  background-color: #d8892c;
+  color: #410500;
+  background-color: #d73e32;
 }

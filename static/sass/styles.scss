@@ -7,20 +7,33 @@
 * {
 	box-sizing: border-box;
 }
+$main: #D73E32;
+$dark1: #410500;
+$dark2: #954C46;
+$light1: #FFA49D;
+$light2: #FFEDEB;
+$white: #FFFFFF;
+$black: #000000;
 
-$dark1: #202D57;
-$light1: #EFDDCB;
-$light2: #FFF9EA;
+// $dark1: #202D57;
+// $light1: #EFDDCB;
+// $light2: #FFF9EA;
 $saturated1: #D8892C;
 $saturated2: #BE7027;
 $animation-duration: 0.2s;
+
+@mixin animate() {
+	@include transition-property(all);
+	@include transition-duration($animation-duration);
+	@include transition-timing-function(ease-in-out);
+}
 
 html, body {
 	padding: 0;
 	margin: 0;
 	position: relative;
-	background-color: $dark1;
-	color: $light1;
+	background-color: $white;
+	color: $black;
 	height: 100%;
 	font-family: 'Open Sans';
 }
@@ -40,23 +53,25 @@ pixel-codeinspector {
 }
 
 @mixin pixel-codeinspector-buttonstyle {
-	color: $saturated1;
+	color: $dark2;
 	&:hover {
-		color: $light1;
+		color: $main;
 	}
+	@include animate();
 }
 
 @mixin pixel-codeinspector-tabstyle {
-	color: $light1;
+	color: $white;
 	background-color: $dark1;
 	&:hover {
-		color: $light1;
-		background-color: $saturated2;
+		color: $white;
+		background-color: $dark2;
 	}
 	&.polymer-selected {
-		color: $light1;
-		background-color: $saturated1;
+		color: $white;
+		background-color: $main;
 	}
+	@include animate();
 }
 
 // No native ShadowDOM
@@ -84,16 +99,18 @@ pixel-codeinspector::part(tab) {
 @mixin pixel-sidebar-containerstyle {
 	$width: 256px;
 	width: $width;
+	background-color: $white;
+
+	@include single-box-shadow($light1, -10px, 0px, 40px, 10px);
+
+	@include animate();
 	left: 0;
-	background-color: $saturated2;
 	&.hidden {
 		left: -$width;
 	}
-	@include single-transition(left, 0.4s, ease-in-out);
 }
 
 @mixin pixel-sidebar-buttonstyle {
-	color: $light2;
 	box-sizing: content-box;
 	padding: 5px;
 	width: 32px;
@@ -101,11 +118,15 @@ pixel-codeinspector::part(tab) {
 	font-size: 32px;
 	text-align: center;
 	cursor: pointer;
+	position: relative;
 
-	@include single-transition(background-color, $animation-duration, ease-in-out);
-	background-color: $saturated2;
+
+	@include animate();
+	color: $light2;
+	background-color: $main;
 	&:hover {
-		background-color: $saturated1;
+		color: $dark1;
+		background-color: $main;
 	}
 }
 
@@ -139,19 +160,18 @@ pixel-pixel {
 	width: 256px;
 	height: 256px;
 	box-sizing: content-box;
-	@include single-transition(border-color, $animation-duration, ease-in-out);
+	@include animate();
 	border-width: $pixel-border;
 	border-style: solid;
-	border-color: transparentize($saturated2, 1.0);
+	border-color: transparentize($main, 1.0);
 	margin-right: $pixel-button-size + 2*$pixel-border;
 	&:hover {
-		border-color: $saturated2;
+		border-color: $main;
 	}
 }
 
 @mixin pixel-pixel-buttonstyle {
 	margin-top: -$pixel-border;
-	color: $light2;
 	box-sizing: content-box;
 	padding: 5px;
 	width: $pixel-button-size;
@@ -163,12 +183,12 @@ pixel-pixel {
 	margin-bottom: $pixel-border;
 	margin-left: $pixel-border;
 
-	@include transition-property(opacity, background-color);
-	@include transition-duration($animation-duration);
-	@include transition-timing-function(ease-in-out);
-	background-color: $saturated2;
+	@include animate();
+	color: $light2;
+	background-color: $main;
 	&:hover {
-		background-color: $saturated1;
+		color: $dark1;
+		background-color: $main;
 	}
 }
 
