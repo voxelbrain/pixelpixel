@@ -137,7 +137,13 @@ func (lc *localContainer) compile() error {
 		return err
 	}
 
-	cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
+	// add extension .exe to compiled program in windows environment
+	ext := ""
+	if ( runtime.GOOS == "windows" ) {
+		ext = ".exe"
+	} 	
+
+	cmd = exec.Command("go", stringList("build", "-o", "pixel" + ext, files)...)
 	cmd.Dir = lc.Root
 	cmd.Stdout = lc.LogBuffer
 	cmd.Stderr = lc.LogBuffer
