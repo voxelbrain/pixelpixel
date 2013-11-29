@@ -143,7 +143,7 @@ func (lc *localContainer) compile() error {
 		ext = ".exe"
 	} 	
 
-	cmd = exec.Command("go", stringList("build", "-o", "pixel", files)...)
+	cmd = exec.Command("go", stringList("build", "-o", "pixel" + ext, files)...)
 	cmd.Dir = lc.Root
 	cmd.Stdout = lc.LogBuffer
 	cmd.Stderr = lc.LogBuffer
