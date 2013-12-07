@@ -7,6 +7,7 @@
 * {
 	box-sizing: border-box;
 }
+
 $main: #D73E32;
 $dark1: #410500;
 $dark2: #954C46;
@@ -15,11 +16,6 @@ $light2: #FFEDEB;
 $white: #FFFFFF;
 $black: #000000;
 
-// $dark1: #202D57;
-// $light1: #EFDDCB;
-// $light2: #FFF9EA;
-$saturated1: #D8892C;
-$saturated2: #BE7027;
 $animation-duration: 0.2s;
 
 @mixin animate() {
@@ -75,20 +71,20 @@ pixel-codeinspector {
 }
 
 // No native ShadowDOM
-pixel-codeinspector *[part=button] {
+pixel-codeinspector *[pseudo=x-button] {
 	@include pixel-codeinspector-buttonstyle;
 }
 
-pixel-codeinspector *[part=tab] {
+pixel-codeinspector *[pseudo=x-tab] {
 	@include pixel-codeinspector-tabstyle;
 }
 
 // Native ShadowDOM
-pixel-codeinspector::part(button) {
+pixel-codeinspector::x-button {
 	@include pixel-codeinspector-buttonstyle;
 }
 
-pixel-codeinspector::part(tab) {
+pixel-codeinspector::x-tab {
 	@include pixel-codeinspector-tabstyle;
 }
 
@@ -131,20 +127,20 @@ pixel-codeinspector::part(tab) {
 }
 
 // No native ShadowDOM
-pixel-sidebar *[part=container] {
+pixel-sidebar *[pseudo=x-container] {
 	@include pixel-sidebar-containerstyle;
 }
 
-pixel-sidebar *[part=button] {
+pixel-sidebar *[pseudo=x-button] {
 	@include pixel-sidebar-buttonstyle;
 }
 
 // Native ShadowDOM
-pixel-sidebar::part(container) {
+pixel-sidebar::x-container {
 	@include pixel-sidebar-containerstyle;
 }
 
-pixel-sidebar::part(button) {
+pixel-sidebar::x-button {
 	@include pixel-sidebar-buttonstyle;
 }
 
@@ -193,11 +189,11 @@ pixel-pixel {
 }
 
 // No native ShadowDOM
-pixel-pixel *[part=button] {
+pixel-pixel *[pseudo=x-button] {
 	@include pixel-pixel-buttonstyle;
 }
 
 // Native ShadowDOM
-pixel-pixel::part(button) {
+pixel-pixel::x-button {
 	@include pixel-pixel-buttonstyle;
 }

@@ -1761,7 +1761,7 @@ pixel-codeinspector.hidden {
   display: none;
 }
 
-pixel-codeinspector *[part=button] {
+pixel-codeinspector *[pseudo=x-button] {
   color: #954c46;
   -webkit-transition-property: all;
   -moz-transition-property: all;
@@ -1776,11 +1776,11 @@ pixel-codeinspector *[part=button] {
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
 }
-pixel-codeinspector *[part=button]:hover {
+pixel-codeinspector *[pseudo=x-button]:hover {
   color: #d73e32;
 }
 
-pixel-codeinspector *[part=tab] {
+pixel-codeinspector *[pseudo=x-tab] {
   color: white;
   background-color: #410500;
   -webkit-transition-property: all;
@@ -1796,16 +1796,16 @@ pixel-codeinspector *[part=tab] {
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
 }
-pixel-codeinspector *[part=tab]:hover {
+pixel-codeinspector *[pseudo=x-tab]:hover {
   color: white;
   background-color: #954c46;
 }
-pixel-codeinspector *[part=tab].polymer-selected {
+pixel-codeinspector *[pseudo=x-tab].polymer-selected {
   color: white;
   background-color: #d73e32;
 }
 
-pixel-codeinspector::part(button) {
+pixel-codeinspector::x-button {
   color: #954c46;
   -webkit-transition-property: all;
   -moz-transition-property: all;
@@ -1820,11 +1820,11 @@ pixel-codeinspector::part(button) {
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
 }
-pixel-codeinspector::part(button):hover {
+pixel-codeinspector::x-button:hover {
   color: #d73e32;
 }
 
-pixel-codeinspector::part(tab) {
+pixel-codeinspector::x-tab {
   color: white;
   background-color: #410500;
   -webkit-transition-property: all;
@@ -1840,16 +1840,16 @@ pixel-codeinspector::part(tab) {
   -o-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
 }
-pixel-codeinspector::part(tab):hover {
+pixel-codeinspector::x-tab:hover {
   color: white;
   background-color: #954c46;
 }
-pixel-codeinspector::part(tab).polymer-selected {
+pixel-codeinspector::x-tab.polymer-selected {
   color: white;
   background-color: #d73e32;
 }
 
-pixel-sidebar *[part=container] {
+pixel-sidebar *[pseudo=x-container] {
   width: 256px;
   background-color: white;
   -webkit-box-shadow: -10px 0px 40px 10px #ffa49d;
@@ -1869,11 +1869,11 @@ pixel-sidebar *[part=container] {
   transition-timing-function: ease-in-out;
   left: 0;
 }
-pixel-sidebar *[part=container].hidden {
+pixel-sidebar *[pseudo=x-container].hidden {
   left: -256px;
 }
 
-pixel-sidebar *[part=button] {
+pixel-sidebar *[pseudo=x-button] {
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1897,12 +1897,12 @@ pixel-sidebar *[part=button] {
   color: #ffedeb;
   background-color: #d73e32;
 }
-pixel-sidebar *[part=button]:hover {
+pixel-sidebar *[pseudo=x-button]:hover {
   color: #410500;
   background-color: #d73e32;
 }
 
-pixel-sidebar::part(container) {
+pixel-sidebar::x-container {
   width: 256px;
   background-color: white;
   -webkit-box-shadow: -10px 0px 40px 10px #ffa49d;
@@ -1922,11 +1922,11 @@ pixel-sidebar::part(container) {
   transition-timing-function: ease-in-out;
   left: 0;
 }
-pixel-sidebar::part(container).hidden {
+pixel-sidebar::x-container.hidden {
   left: -256px;
 }
 
-pixel-sidebar::part(button) {
+pixel-sidebar::x-button {
   box-sizing: content-box;
   padding: 5px;
   width: 32px;
@@ -1950,7 +1950,7 @@ pixel-sidebar::part(button) {
   color: #ffedeb;
   background-color: #d73e32;
 }
-pixel-sidebar::part(button):hover {
+pixel-sidebar::x-button:hover {
   color: #410500;
   background-color: #d73e32;
 }
@@ -1981,7 +1981,7 @@ pixel-pixel:hover {
   border-color: #d73e32;
 }
 
-pixel-pixel *[part=button] {
+pixel-pixel *[pseudo=x-button] {
   margin-top: -5px;
   box-sizing: content-box;
   padding: 5px;
@@ -2008,12 +2008,12 @@ pixel-pixel *[part=button] {
   color: #ffedeb;
   background-color: #d73e32;
 }
-pixel-pixel *[part=button]:hover {
+pixel-pixel *[pseudo=x-button]:hover {
   color: #410500;
   background-color: #d73e32;
 }
 
-pixel-pixel::part(button) {
+pixel-pixel::x-button {
   margin-top: -5px;
   box-sizing: content-box;
   padding: 5px;
@@ -2040,7 +2040,7 @@ pixel-pixel::part(button) {
   color: #ffedeb;
   background-color: #d73e32;
 }
-pixel-pixel::part(button):hover {
+pixel-pixel::x-button:hover {
   color: #410500;
   background-color: #d73e32;
 }

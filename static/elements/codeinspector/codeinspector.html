@@ -10,10 +10,10 @@
 			behaviour of the ShadwDOM polyfill -->
 			<pixel-code id="code"><code></code></pixel-code>
 
-			<div class="icon" id="close" part="button">
+			<div class="icon" id="close" pseudo="x-button">
 				<div class="fa fa-times-circle-o"></div>
 			</div>
-			<div class="icon" id="reload" part="button">
+			<div class="icon" id="reload" pseudo="x-button">
 				<div class="fa fa-refresh"></div>
 			</div>
 		</div>
@@ -27,7 +27,7 @@
 
 		function newTabNode(title) {
 			var node = document.createElement('span');
-			node.setAttribute('part', 'tab');
+			node.setAttribute('pseudo', 'x-tab');
 			node.innerText = title;
 			return node;
 		}
