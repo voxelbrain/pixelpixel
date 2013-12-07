@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 )
 
 type LocalContainerCreator struct {
@@ -138,12 +139,12 @@ func (lc *localContainer) compile() error {
 	}
 
 	// add extension .exe to compiled program in windows environment
-	ext := ""
-	if ( runtime.GOOS == "windows" ) {
-		ext = ".exe"
-	} 	
+	filename := "pixel"
+	if runtime.GOOS == "windows" {
+		filename += ".exe"
+	}
 
-	cmd = exec.Command("go", stringList("build", "-o", "pixel" + ext, files)...)
+	cmd = exec.Command("go", stringList("build", "-o", filename, files)...)
 	cmd.Dir = lc.Root
 	cmd.Stdout = lc.LogBuffer
 	cmd.Stderr = lc.LogBuffer
