@@ -34,8 +34,12 @@ html, body {
 	font-family: 'Open Sans';
 }
 
-html {
-	padding: 50px;
+//
+// Pixel Wall
+//
+
+pixel-pixelwall {
+	margin: 50px;
 }
 
 //
@@ -48,44 +52,33 @@ pixel-codeinspector {
 	}
 }
 
-@mixin pixel-codeinspector-buttonstyle {
-	color: $dark2;
-	&:hover {
-		color: $main;
+pixel-codeinspector {
+	padding: 50px;
+	&::shadow *[pseudo=x-button] {
+		color: $dark2;
+		&:hover {
+			color: $main;
+		}
+		@include animate();
 	}
-	@include animate();
 }
 
-@mixin pixel-codeinspector-tabstyle {
-	color: $white;
-	background-color: $dark1;
-	&:hover {
+pixel-codeinspector::shadow paper-tabs {
+	&::shadow {
+		#selectionBar {
+			background-color: $light1;
+		}
+		#ink {
+			color: $light1;
+		}
+	}
+	paper-tab {
+		background-color: $dark1;
 		color: $white;
-		background-color: $dark2;
+		&::shadow #ink {
+			color: $light1;
+		}
 	}
-	&.polymer-selected {
-		color: $white;
-		background-color: $main;
-	}
-	@include animate();
-}
-
-// No native ShadowDOM
-pixel-codeinspector *[pseudo=x-button] {
-	@include pixel-codeinspector-buttonstyle;
-}
-
-pixel-codeinspector *[pseudo=x-tab] {
-	@include pixel-codeinspector-tabstyle;
-}
-
-// Native ShadowDOM
-pixel-codeinspector::x-button {
-	@include pixel-codeinspector-buttonstyle;
-}
-
-pixel-codeinspector::x-tab {
-	@include pixel-codeinspector-tabstyle;
 }
 
 //
@@ -97,7 +90,7 @@ pixel-codeinspector::x-tab {
 	width: $width;
 	background-color: $white;
 
-	@include single-box-shadow($light1, -10px, 0px, 40px, 10px);
+	@include single-box-shadow(-10px, 0px, 40px, 10px, $light1);
 
 	@include animate();
 	left: 0;
@@ -126,21 +119,11 @@ pixel-codeinspector::x-tab {
 	}
 }
 
-// No native ShadowDOM
-pixel-sidebar *[pseudo=x-container] {
+pixel-sidebar::shadow *[pseudo=x-container] {
 	@include pixel-sidebar-containerstyle;
 }
 
-pixel-sidebar *[pseudo=x-button] {
-	@include pixel-sidebar-buttonstyle;
-}
-
-// Native ShadowDOM
-pixel-sidebar::x-container {
-	@include pixel-sidebar-containerstyle;
-}
-
-pixel-sidebar::x-button {
+pixel-sidebar::shadow *[pseudo=x-button] {
 	@include pixel-sidebar-buttonstyle;
 }
 
@@ -188,12 +171,6 @@ pixel-pixel {
 	}
 }
 
-// No native ShadowDOM
-pixel-pixel *[pseudo=x-button] {
-	@include pixel-pixel-buttonstyle;
-}
-
-// Native ShadowDOM
-pixel-pixel::x-button {
+pixel-pixel::shadow *[pseudo=x-button] {
 	@include pixel-pixel-buttonstyle;
 }

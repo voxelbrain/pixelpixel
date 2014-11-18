@@ -18,7 +18,7 @@
 			},
 			readInitialState: function() {
 				reqwest({
-					url: '/pixels',
+					url: '/pixels/',
 					method: 'GET',
 					type: 'json'
 				}).then(function(data) {
@@ -28,10 +28,12 @@
 							this.fire('pixelCrash', pixel.id);
 						}
 					}.bind(this));
-				}.bind(this))
+				}.bind(this), function(err) {
+					console.log('error', err);
+				})
 			},
 			message: function(ev) {
-				event = JSON.parse(ev.data);
+				var event = JSON.parse(ev.data);
 				switch(event.type) {
 					case type_created:
 						this.fire('pixelCreate', event.pixel);

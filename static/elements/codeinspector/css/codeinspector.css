@@ -19,7 +19,6 @@
 
 :host .dialog {
     position: relative;
-    padding: 50px;
     opacity: 1.0;
     z-index: 200;
 }
@@ -32,26 +31,18 @@ polymer-ui-tabs {
 div.icon {
     height: 32px;
     width: 32px;
-    position: relative;
     margin: 15px;
     overflow: hidden;
     display: inline-block;
+    cursor: pointer;
 }
 
 div.icon > div {
     font-size: 32px;
 }
 
-div.icon {
-	position: absolute;
-	cursor: pointer;
-	top: 0px;
-}
-
-#close {
-	right: 0;
-}
-
-#reload{
-	right: 60px;
+div.buttons {
+    display: block;
+    width: 100%;
+    text-align: right;
 }
