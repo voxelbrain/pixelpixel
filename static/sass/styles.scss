@@ -55,9 +55,9 @@ pixel-codeinspector {
 pixel-codeinspector {
 	padding: 50px;
 	&::shadow *[pseudo=x-button] {
-		color: $dark2;
+		color: $dark1;
 		&:hover {
-			color: $main;
+			color: $light1;
 		}
 		@include animate();
 	}
@@ -82,52 +82,6 @@ pixel-codeinspector::shadow paper-tabs {
 }
 
 //
-// Sidebar
-//
-
-@mixin pixel-sidebar-containerstyle {
-	$width: 256px;
-	width: $width;
-	background-color: $white;
-
-	@include single-box-shadow(-10px, 0px, 40px, 10px, $light1);
-
-	@include animate();
-	left: 0;
-	&.hidden {
-		left: -$width;
-	}
-}
-
-@mixin pixel-sidebar-buttonstyle {
-	box-sizing: content-box;
-	padding: 5px;
-	width: 32px;
-	height: 32px;
-	font-size: 32px;
-	text-align: center;
-	cursor: pointer;
-	position: relative;
-
-
-	@include animate();
-	color: $light2;
-	background-color: $main;
-	&:hover {
-		color: $dark1;
-		background-color: $main;
-	}
-}
-
-pixel-sidebar::shadow *[pseudo=x-container] {
-	@include pixel-sidebar-containerstyle;
-}
-
-pixel-sidebar::shadow *[pseudo=x-button] {
-	@include pixel-sidebar-buttonstyle;
-}
-
-//
 // Pixel
 //
 
@@ -149,7 +103,7 @@ pixel-pixel {
 	}
 }
 
-@mixin pixel-pixel-buttonstyle {
+pixel-pixel::shadow *[pseudo=x-button] {
 	margin-top: -$pixel-border;
 	box-sizing: content-box;
 	padding: 5px;
@@ -169,8 +123,4 @@ pixel-pixel {
 		color: $dark1;
 		background-color: $main;
 	}
-}
-
-pixel-pixel::shadow *[pseudo=x-button] {
-	@include pixel-pixel-buttonstyle;
 }

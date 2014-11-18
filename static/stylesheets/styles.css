@@ -1755,7 +1755,7 @@ pixel-codeinspector {
   padding: 50px;
 }
 pixel-codeinspector::shadow *[pseudo=x-button] {
-  color: #954C46;
+  color: #410500;
   -moz-transition-property: all;
   -o-transition-property: all;
   -webkit-transition-property: all;
@@ -1770,7 +1770,7 @@ pixel-codeinspector::shadow *[pseudo=x-button] {
   transition-timing-function: ease-in-out;
 }
 pixel-codeinspector::shadow *[pseudo=x-button]:hover {
-  color: #D73E32;
+  color: #FFA49D;
 }
 
 pixel-codeinspector::shadow paper-tabs::shadow #selectionBar {
@@ -1785,59 +1785,6 @@ pixel-codeinspector::shadow paper-tabs paper-tab {
 }
 pixel-codeinspector::shadow paper-tabs paper-tab::shadow #ink {
   color: #FFA49D;
-}
-
-pixel-sidebar::shadow *[pseudo=x-container] {
-  width: 256px;
-  background-color: #FFFFFF;
-  -moz-box-shadow: -10px 0px 40px 10px #FFA49D;
-  -webkit-box-shadow: -10px 0px 40px 10px #FFA49D;
-  box-shadow: -10px 0px 40px 10px #FFA49D;
-  -moz-transition-property: all;
-  -o-transition-property: all;
-  -webkit-transition-property: all;
-  transition-property: all;
-  -moz-transition-duration: 0.2s;
-  -o-transition-duration: 0.2s;
-  -webkit-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -moz-transition-timing-function: ease-in-out;
-  -o-transition-timing-function: ease-in-out;
-  -webkit-transition-timing-function: ease-in-out;
-  transition-timing-function: ease-in-out;
-  left: 0;
-}
-pixel-sidebar::shadow *[pseudo=x-container].hidden {
-  left: -256px;
-}
-
-pixel-sidebar::shadow *[pseudo=x-button] {
-  box-sizing: content-box;
-  padding: 5px;
-  width: 32px;
-  height: 32px;
-  font-size: 32px;
-  text-align: center;
-  cursor: pointer;
-  position: relative;
-  -moz-transition-property: all;
-  -o-transition-property: all;
-  -webkit-transition-property: all;
-  transition-property: all;
-  -moz-transition-duration: 0.2s;
-  -o-transition-duration: 0.2s;
-  -webkit-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -moz-transition-timing-function: ease-in-out;
-  -o-transition-timing-function: ease-in-out;
-  -webkit-transition-timing-function: ease-in-out;
-  transition-timing-function: ease-in-out;
-  color: #FFEDEB;
-  background-color: #D73E32;
-}
-pixel-sidebar::shadow *[pseudo=x-button]:hover {
-  color: #410500;
-  background-color: #D73E32;
 }
 
 pixel-pixel {

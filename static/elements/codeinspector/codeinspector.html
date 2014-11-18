@@ -6,10 +6,10 @@
 		<div class="dialog">
 			<div class="buttons">
 				<div class="icon" id="reload" pseudo="x-button">
-					<div class="fa fa-refresh"></div>
+					<fa-icon icon="refresh"></fa-icon>
 				</div>
 				<div class="icon" id="close" pseudo="x-button">
-					<div class="fa fa-times-circle-o"></div>
+					<fa-icon icon="times-circle-o"></fa-icon>
 				</div>
 			</div>
 			<paper-tabs id="files" valueattr="innerText">
@@ -35,7 +35,6 @@
 		}
 
 		Polymer('pixel-codeinspector', {
-			applyAuthorStyles: true,
 			key: '',
 			files: {},
 			empty: function() {

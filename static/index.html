@@ -9,6 +9,7 @@
 	<link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
 
     <link rel="import" href="/elements/polymer/polymer.html">
+    <link rel="import" href="/elements/fa-icon/fa-icon.html">
     <link rel="import" href="/elements/pixel/pixel.html">
     <link rel="import" href="/elements/connection/connection.html">
     <link rel="import" href="/elements/pixelwall/pixelwall.html">
@@ -16,20 +17,13 @@
     <link rel="import" href="/elements/codeinspector/codeinspector.html">
     <link rel="import" href="/elements/sidebar/sidebar.html">
     <link rel="import" href="/elements/paper-elements/paper-elements.html">
-<!--     <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-tabs/polymer-ui-tabs.html">
-    <link rel="import" href="/elements/polymer-elements/polymer-selector/polymer-selector.html">
-    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-splitter/polymer-ui-splitter.html">
- --></head>
+</head>
 <body>
 	<pixel-connection id="connection"></pixel-connection>
 	<pixel-codeinspector id="inspector" class="hidden"></pixel-codeinspector>
-	<!-- <pixel-sidebar>
-		<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a><a href="http://godoc.org/github.com/voxelbrain/pixelpixel/pixelutils">Documentation</a></footer>
-	</pixel-sidebar> -->
 	<pixel-pixelwall id="wall"></pixel-pixelwall>
 	<script>
 		window.addEventListener('polymer-ready', function() {
-			console.log('ready');
 			var conn = document.getElementById('connection');
 			var wall = document.getElementById('wall');
 			var insp = document.getElementById('inspector');
