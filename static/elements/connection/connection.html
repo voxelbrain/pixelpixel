@@ -4,6 +4,7 @@
 		var type_created = i++;
 		var type_change  = i++;
 		var type_failure = i++;
+		var type_remove = i++;
 
 		Polymer('pixel-connection', {
 			ws: null,
@@ -28,9 +29,7 @@
 							this.fire('pixelCrash', pixel.id);
 						}
 					}.bind(this));
-				}.bind(this), function(err) {
-					console.log('error', err);
-				})
+				}.bind(this));
 			},
 			message: function(ev) {
 				var event = JSON.parse(ev.data);
@@ -43,6 +42,9 @@
 					break;
 					case type_failure:
 						this.fire('pixelCrash', event.pixel);
+					break;
+					case type_remove:
+						this.fire('pixelRemove', event.pixel);
 					break;
 				}
 			},

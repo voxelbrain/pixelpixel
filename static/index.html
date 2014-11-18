@@ -41,6 +41,9 @@
 			conn.addEventListener('pixelCrash', function(ev) {
 				document.getElementById(ev.detail).setCrashed(true);
 			});
+			conn.addEventListener('pixelRemove', function(ev) {
+				document.getElementById(ev.detail).remove();
+			});
 			wall.addEventListener('pixelClick', function(ev) {
 				var key = ev.detail.key;
 				var pos = {

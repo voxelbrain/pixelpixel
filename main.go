@@ -22,6 +22,7 @@ var (
 		TemplateDir     string        `goptions:"-t, --templates, description='Path to the templates'"`
 		StaticDir       string        `goptions:"--static, description='Path to the static content'"`
 		Lxc             bool          `goptions:"-x, --lxc, description='Use lxc containers for pixels'"`
+		DeleteToken     string        `goptions:"--delete-token, description='Token to authorize deletion'"`
 		Help            goptions.Help `goptions:"-h, --help, description='Show this help'"`
 	}{
 		Listen:          "localhost:8080",
