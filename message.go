@@ -6,6 +6,7 @@ const (
 	TypeCreate MessageType = iota
 	TypeChange
 	TypeFailure
+	TypeDelete
 )
 
 type Message struct {

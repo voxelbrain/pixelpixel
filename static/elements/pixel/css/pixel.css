@@ -3,7 +3,7 @@
 	display: inline-block;
 }
 
-:host:hover > ul > li {
+:host(:hover) > ul > li {
 	opacity: 1.0;
 }
 

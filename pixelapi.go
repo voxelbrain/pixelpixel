@@ -46,8 +46,9 @@ func NewPixelApi(cc ContainerCreator) *PixelApi {
 				"/logs":    httptools.MethodSwitch{"GET": http.HandlerFunc(pa.GetPixelLogs)},
 				"/fs":      httptools.MethodSwitch{"GET": http.HandlerFunc(pa.GetPixelFs)},
 				"/": httptools.MethodSwitch{
-					"GET": http.HandlerFunc(pa.ShowPixel),
-					"PUT": http.HandlerFunc(pa.UpdatePixel),
+					"GET":    http.HandlerFunc(pa.ShowPixel),
+					"PUT":    http.HandlerFunc(pa.UpdatePixel),
+					"DELETE": http.HandlerFunc(pa.DeletePixel),
 				},
 			}),
 		},
@@ -132,6 +133,22 @@ func (pa *PixelApi) UpdatePixel(w http.ResponseWriter, r *http.Request) {
 	go pa.pixelListener(pixel)
 
 	http.Error(w, pixel.Id, http.StatusCreated)
+}
+
+func (pa *PixelApi) DeletePixel(w http.ResponseWriter, r *http.Request) {
+	pixel := w.(httptools.VarsResponseWriter).Vars()["pixel"].(*Pixel)
+	token, err := r.Cookie("deleteToken")
+	if options.DeleteToken == "" || err != nil || token.Value != options.DeleteToken {
+		http.Error(w, pixel.Id, http.StatusForbidden)
+		return
+	}
+
+	StopContainer(pixel.Container)
+	pa.Messages <- &Message{
+		Pixel: pixel.Id,
+		Type:  TypeDelete,
+	}
+	http.Error(w, pixel.Id, http.StatusOK)
 }
 
 func (pa *PixelApi) pixelListener(pixel *Pixel) {

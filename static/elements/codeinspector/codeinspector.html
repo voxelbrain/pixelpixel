@@ -4,18 +4,20 @@
 		<div class="background">
 		</div>
 		<div class="dialog">
-			<polymer-ui-tabs id="files" valueattr="innerText">
-			</polymer-ui-tabs>
+			<div class="buttons">
+				<div class="icon" id="reload" pseudo="x-button">
+					<fa-icon icon="refresh"></fa-icon>
+				</div>
+				<div class="icon" id="close" pseudo="x-button">
+					<fa-icon icon="times-circle-o"></fa-icon>
+				</div>
+			</div>
+			<paper-tabs id="files" valueattr="innerText">
+			</paper-tabs>
 			<!-- FIXME: The inner code block is a temporary fix for the
 			behaviour of the ShadwDOM polyfill -->
 			<pixel-code id="code"><code></code></pixel-code>
 
-			<div class="icon" id="close" part="button">
-				<div class="fa fa-times-circle-o"></div>
-			</div>
-			<div class="icon" id="reload" part="button">
-				<div class="fa fa-refresh"></div>
-			</div>
 		</div>
 	</template>
 	<script>
@@ -26,14 +28,13 @@
 		}
 
 		function newTabNode(title) {
-			var node = document.createElement('span');
-			node.setAttribute('part', 'tab');
+			var node = document.createElement('paper-tab');
+			// node.setAttribute('pseudo', 'x-tab');
 			node.innerText = title;
 			return node;
 		}
 
 		Polymer('pixel-codeinspector', {
-			applyAuthorStyles: true,
 			key: '',
 			files: {},
 			empty: function() {
@@ -92,7 +93,7 @@
 				this.reload();
 			},
 			ready: function() {
-				this.$.files.addEventListener('polymer-activate', this.updateContent.bind(this));
+				this.$.files.addEventListener('core-activate', this.updateContent.bind(this));
 				this.$.close.addEventListener('click', function() {
 					this.fire('close');
 				}.bind(this));

@@ -4,6 +4,7 @@
 		var type_created = i++;
 		var type_change  = i++;
 		var type_failure = i++;
+		var type_remove = i++;
 
 		Polymer('pixel-connection', {
 			ws: null,
@@ -18,7 +19,7 @@
 			},
 			readInitialState: function() {
 				reqwest({
-					url: '/pixels',
+					url: '/pixels/',
 					method: 'GET',
 					type: 'json'
 				}).then(function(data) {
@@ -28,10 +29,10 @@
 							this.fire('pixelCrash', pixel.id);
 						}
 					}.bind(this));
-				}.bind(this))
+				}.bind(this));
 			},
 			message: function(ev) {
-				event = JSON.parse(ev.data);
+				var event = JSON.parse(ev.data);
 				switch(event.type) {
 					case type_created:
 						this.fire('pixelCreate', event.pixel);
@@ -41,6 +42,9 @@
 					break;
 					case type_failure:
 						this.fire('pixelCrash', event.pixel);
+					break;
+					case type_remove:
+						this.fire('pixelRemove', event.pixel);
 					break;
 				}
 			},

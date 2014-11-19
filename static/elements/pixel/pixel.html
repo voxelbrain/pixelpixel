@@ -4,14 +4,13 @@
 	<template>
 		<link href="css/pixel.css" rel="stylesheet" type="text/css" />
 		<ul>
-			<li part="button" id="details"><i class="fa fa-search"></i></li>
-			<li part="button"><i class="fa fa-times-circle-o"></i></li>
+			<li pseudo="x-button" id="details"><fa-icon icon="search"></fa-icon></li>
+			<li pseudo="x-button" id="remove"><fa-icon icon="times-circle-o"></fa-icon></li>
 		</ul>
 		<canvas id="canvas"></canvas>
 	</template>
 	<script>
 		Polymer('pixel-pixel', {
-			applyAuthorStyles: true,
 			key: '',
 			update: function() {
 				PNG.load('/pixels/'+this.key+'/content', this.$.canvas);
@@ -28,6 +27,12 @@
 				}.bind(this));
 				this.$.details.addEventListener('click', function(ev) {
 					this.fire('showCode', this.key)
+				}.bind(this));
+				this.$.remove.addEventListener('click', function(ev) {
+					reqwest({
+						url: '/pixels/'+this.key,
+						method: 'DELETE',
+					});
 				}.bind(this));
 			},
 			setCrashed: function(b) {
