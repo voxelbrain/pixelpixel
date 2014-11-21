@@ -1,39 +1,48 @@
 <!doctype html>
 <head>
+	<script src="/js/lodash.min.js"></script>
+	<script src="/js/q.js"></script>
+	<script src="/js/reqwest.min.js"></script>
+	<script src="/js/webcomponents.min.js"></script>
+
 	<link href="/templates/styles.css" rel="stylesheet" type="text/css" />
 	<link href="/stylesheets/styles.css" rel="stylesheet" type="text/css" />
 
-	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-	<script src="/js/polymer.min.js"></script>
-
+    <link rel="import" href="/elements/polymer/polymer.html">
+    <link rel="import" href="/elements/fa-icon/fa-icon.html">
     <link rel="import" href="/elements/pixel/pixel.html">
     <link rel="import" href="/elements/connection/connection.html">
     <link rel="import" href="/elements/pixelwall/pixelwall.html">
     <link rel="import" href="/elements/code/code.html">
     <link rel="import" href="/elements/codeinspector/codeinspector.html">
-    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-tabs/polymer-ui-tabs.html">
-    <link rel="import" href="/elements/polymer-elements/polymer-selector/polymer-selector.html">
-    <link rel="import" href="/elements/polymer-ui-elements/polymer-ui-splitter/polymer-ui-splitter.html">
+    <link rel="import" href="/elements/sidebar/sidebar.html">
+    <link rel="import" href="/elements/paper-elements/paper-elements.html">
 </head>
 <body>
 	<pixel-connection id="connection"></pixel-connection>
 	<pixel-codeinspector id="inspector" class="hidden"></pixel-codeinspector>
 	<pixel-pixelwall id="wall"></pixel-pixelwall>
-	<footer>©2013 voxelbrain <a href="http://github.com/voxelbrain/pixelpixel">GitHub</a></footer>
 	<script>
-		window.addEventListener('WebComponentsReady', function() {
+		window.addEventListener('polymer-ready', function() {
 			var conn = document.getElementById('connection');
 			var wall = document.getElementById('wall');
 			var insp = document.getElementById('inspector');
 
 			conn.addEventListener('pixelCreate', function(ev) {
-				wall.pixels += ' ' + ev.detail;
+				var pixel = document.createElement('pixel-pixel');
+				pixel.key = ev.detail;
+				pixel.id = ev.detail;
+				wall.appendChild(pixel);
 			});
 			conn.addEventListener('pixelChange', function(ev) {
-				wall.update(ev.detail)
+				document.getElementById(ev.detail).update(ev.detail)
+				document.getElementById(ev.detail).setCrashed(false);
 			});
 			conn.addEventListener('pixelCrash', function(ev) {
-				wall.markCrashed(ev.detail)
+				document.getElementById(ev.detail).setCrashed(true);
+			});
+			conn.addEventListener('pixelRemove', function(ev) {
+				document.getElementById(ev.detail).remove();
 			});
 			wall.addEventListener('pixelClick', function(ev) {
 				var key = ev.detail.key;
@@ -43,14 +52,14 @@
 				};
 				conn.reportClick(key, pos);
 			});
-			wall.addEventListener('headerClick', function(ev) {
+			wall.addEventListener('showCode', function(ev) {
 				insp.key = ev.detail;
 				insp.className = '';
 			});
 			insp.addEventListener('close', function() {
 				insp.className = 'hidden';
-			})
-			conn.href = 'ws://'+window.location.host+'/ws';
+			});
+			conn.href = window.location.host;
 		});
 	</script>
 </body>

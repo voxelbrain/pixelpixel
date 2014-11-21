@@ -35,6 +35,11 @@ const (
 func main() {
 	fs := goptions.NewFlagSet("picli", &options)
 	err := fs.Parse(os.Args[1:])
+	if err == goptions.ErrHelpRequest {
+		fs.PrintHelp(os.Stderr)
+		return
+	}
+
 	options.Server = validateServer(options.Server)
 	key := prepareKey()
 

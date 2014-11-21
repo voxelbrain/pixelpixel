@@ -3,11 +3,11 @@
 <polymer-element name="pixel-pixel" attributes="key">
 	<template>
 		<link href="css/pixel.css" rel="stylesheet" type="text/css" />
-		<div>
-			<header id="header">{{key}}</header>
-			<canvas id="canvas"></canvas>
-			<footer></footer>
-		</div>
+		<ul>
+			<li pseudo="x-button" id="details"><fa-icon icon="search"></fa-icon></li>
+			<li pseudo="x-button" id="remove"><fa-icon icon="times-circle-o"></fa-icon></li>
+		</ul>
+		<canvas id="canvas"></canvas>
 	</template>
 	<script>
 		Polymer('pixel-pixel', {
@@ -25,9 +25,18 @@
 						y: ev.y - r.top,
 					});
 				}.bind(this));
-				this.$.header.addEventListener('click', function(ev) {
-					this.fire('headerClick', this.key)
+				this.$.details.addEventListener('click', function(ev) {
+					this.fire('showCode', this.key)
 				}.bind(this));
+				this.$.remove.addEventListener('click', function(ev) {
+					reqwest({
+						url: '/pixels/'+this.key,
+						method: 'DELETE',
+					});
+				}.bind(this));
+			},
+			setCrashed: function(b) {
+				this.$.canvas.className = b?"crashed":"";
 			},
 			keyChanged: function() {
 				this.update();

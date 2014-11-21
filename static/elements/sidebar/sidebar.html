@@ -1,0 +1,19 @@
+<polymer-element name="pixel-sidebar">
+	<template>
+		<link href="css/sidebar.css" rel="stylesheet" type="text/css" />
+		<div id="container" pseudo="x-container" class="hidden">
+			<i id="button" class="fa fa-bars" pseudo="x-button"></i>
+			<content></content>
+		</div>
+	</template>
+	<script>
+		Polymer('pixel-sidebar', {
+			key: '',
+			ready: function() {
+				this.$.button.addEventListener('click', function(ev) {
+					this.$.container.className = this.$.container.className=='hidden'?'':'hidden';
+				}.bind(this));
+			},
+		});
+	</script>
+</polymer-element>

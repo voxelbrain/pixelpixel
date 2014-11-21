@@ -1,3 +1,28 @@
+:host {
+    position: absolute;
+    width: 100%;
+}
+
+:host > div {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+:host .background {
+    background-color: black;
+    opacity: 0.8;
+    z-index: 100;
+}
+
+:host .dialog {
+    position: relative;
+    opacity: 1.0;
+    z-index: 200;
+}
+
 polymer-ui-tabs {
 	margin-right: 100px;
 	margin-bottom: 10px;
@@ -6,90 +31,18 @@ polymer-ui-tabs {
 div.icon {
     height: 32px;
     width: 32px;
-    position: relative;
     margin: 15px;
     overflow: hidden;
     display: inline-block;
+    cursor: pointer;
 }
 
-div.icon {
-	position: absolute;
-	cursor: pointer;
-	top: 0;
+div.icon > div {
+    font-size: 32px;
 }
 
-#close {
-	right: 0;
-}
-
-#reload{
-	right: 60px;
-}
-
-div.icon div.reload {
-    width: 18px;
-    height: 9px;
-    border-style: solid;
-    border-width: 0px 4px 4px 4px;
-    border-color: #333;
-    -webkit-border-radius: 0 0 50px 50px;
-    -moz-border-radius: 0 0 50px 50px;
-    border-radius: 0 0 50px 50px;
-    position: absolute;
-    top: 18px;
-    left: 2px;
-}
-
-div.icon div.reload:after {
-    content: '';
-    width: 9px;
-    height: 9px;
-    border-style: solid;
-    border-width: 4px 0 0 4px;
-    border-color: #333;
-    -webkit-border-radius: 50px 0 0 0;
-    -moz-border-radius: 50px 0 0 0;
-    border-radius: 50px 0 0 0;
-    position: absolute;
-    left: -4px;
-    bottom: 9px;
-}
-
-div.icon div.reload:before {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 6px;
-    border-color: transparent transparent transparent #333;
-    bottom: 14px;
-    left: 9px;
-}
-
-div.icon div.cross {
-    width: 25px;
-    height: 4px;
-    background: #333;
-    margin: 15px 0 0 4px;
-    -webkit-transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -ms-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-}
-
-div.icon div.cross:after {
-    content: '';
-    width: 25px;
-    height: 4px;
-    background: #333;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-    transform: rotate(90deg);
+div.buttons {
+    display: block;
+    width: 100%;
+    text-align: right;
 }

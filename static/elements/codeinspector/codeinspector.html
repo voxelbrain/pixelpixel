@@ -1,15 +1,23 @@
 <polymer-element name="pixel-codeinspector" attributes="key">
 	<template>
 		<link href="css/codeinspector.css" rel="stylesheet" type="text/css" />
-		<polymer-ui-tabs id="files" valueattr="innerText">
-		</polymer-ui-tabs>
-		<pixel-code id="code"></pixel-code>
-
-		<div class="icon" id="close">
-			<div class="cross"></div>
+		<div class="background">
 		</div>
-		<div class="icon" id="reload">
-			<div class="reload"></div>
+		<div class="dialog">
+			<div class="buttons">
+				<div class="icon" id="reload" pseudo="x-button">
+					<fa-icon icon="refresh"></fa-icon>
+				</div>
+				<div class="icon" id="close" pseudo="x-button">
+					<fa-icon icon="times-circle-o"></fa-icon>
+				</div>
+			</div>
+			<paper-tabs id="files" valueattr="innerText">
+			</paper-tabs>
+			<!-- FIXME: The inner code block is a temporary fix for the
+			behaviour of the ShadwDOM polyfill -->
+			<pixel-code id="code"><code></code></pixel-code>
+
 		</div>
 	</template>
 	<script>
@@ -20,7 +28,8 @@
 		}
 
 		function newTabNode(title) {
-			var node = document.createElement('span');
+			var node = document.createElement('paper-tab');
+			// node.setAttribute('pseudo', 'x-tab');
 			node.innerText = title;
 			return node;
 		}
@@ -31,17 +40,17 @@
 			empty: function() {
 				this.files = {};
 				removeAllChildren(this.$.files);
-				this.$.code.innerText = '';
+				this.$.code.querySelector('code').innerText = '';
 			},
 			updateTabs: function() {
 				this.$.files.appendChild(newTabNode('Logs'));
-				for(var file in this.files) {
-					if(file == 'Logs') {
-						continue;
+				_(this.files).each(function(_, filename) {
+					if(filename == 'Logs') {
+						return;
 					}
-					this.$.files.appendChild(newTabNode(file));
-				}
-				this.$.files.selected = '';
+					this.$.files.appendChild(newTabNode(filename));
+				}.bind(this));
+				this.$.files.selected = 'Logs';
 			},
 			updateContent: function() {
 				var file = this.$.files.selected;
@@ -49,20 +58,30 @@
 				if(file in this.files) {
 					content = this.files[file];
 				}
-				this.$.code.innerText = content;
+				this.$.code.querySelector('code').innerText = content;
 				if(/\.go$/.test(file)) {
-					this.$.code.language = "go";
+					this.$.code.language = 'go';
 				} else {
-					this.$.code.language = "plain";
+					this.$.code.language = 'plain';
 				}
 				this.$.code.update();
 			},
 			reloadFiles: function() {
-				$.get('/pixels/'+this.key+'/fs').success(function(data) {
+				var xhr = new XMLHttpRequest();
+				reqwest({
+					method: 'GET',
+					url: '/pixels/'+this.key+'/fs',
+					type: 'json'
+				}).then(function(data) {
 					this.files = data;
-					$.get('/pixels/'+this.key+'/logs').success(function(data) {
+					return reqwest({
+						method: 'GET',
+						url: '/pixels/'+this.key+'/logs',
+						type: 'html' // i.e. don't try to parse
+					}).then(function(data) {
 						this.files['Logs'] = data;
 						this.updateTabs();
+						this.updateContent();
 					}.bind(this));
 				}.bind(this));
 			},
@@ -74,17 +93,13 @@
 				this.reload();
 			},
 			ready: function() {
-				var oldFn = this.$.files.selectedChanged.bind(this.$.files);
-				this.$.files.selectedChanged = function() {
-					oldFn();
-					this.updateContent();
-				}.bind(this);
+				this.$.files.addEventListener('core-activate', this.updateContent.bind(this));
 				this.$.close.addEventListener('click', function() {
 					this.fire('close');
-				}.bind(this))
+				}.bind(this));
 				this.$.reload.addEventListener('click', function() {
 					this.reload();
-				}.bind(this))
+				}.bind(this));
 			},
 		});
 	</script>
